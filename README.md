@@ -60,6 +60,10 @@ This application makes it easy to retrieve coordinates for Regions of Interest i
 
 PolygonZone accompanies [Roboflow Supervision](https://github.com/roboflow/supervision), a Python library with a range of utilities that are useful in computer vision projects.
 
+Please note that PolygonZone is not an annotation tool. It is a tool for retrieving coordinates of polygons that you have drawn on an image.
+
+This application is designed for desktop use.
+
 ## Getting Started 🚀
 
 To use PolygonZone, open up the [PolygonZone web application](https://roboflow.github.io/polygonzone/). Then:
