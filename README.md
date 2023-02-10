@@ -50,6 +50,9 @@
     </a>
     </a>
 </div>
+<br>
+
+## About PolygonZone 📐
 
 PolygonZone lets you draw arbitrary polygons on an image and retrieve the coordinates of the points you have drawn.
 
@@ -57,7 +60,7 @@ This application makes it easy to retrieve coordinates for Regions of Interest i
 
 PolygonZone accompanies [Roboflow Supervision](https://github.com/roboflow/supervision), a Python library with a range of utilities that are useful in computer vision projects.
 
-## Getting Started
+## Getting Started 🚀
 
 To use PolygonZone, open up the [PolygonZone web application](https://roboflow.github.io/polygonzone/). Then:
 
@@ -69,6 +72,6 @@ To use PolygonZone, open up the [PolygonZone web application](https://roboflow.g
 
 You can zoom in and out of an image using the mouse wheel or a laptop track pad.
 
-## Contributing
+## Contributing 🤝
 
 We welcome contributions to the PolygonZone project. Please see the [Contributing Guidelines](CONTRIBUTING.md) for more information on how you can help to improve this project.
