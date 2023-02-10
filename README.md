@@ -1,1 +1,74 @@
-# polygonzone
+<p>
+    <a align="center" href="" target="_blank">
+        <img
+        width="850"
+        src="https://media.roboflow.com/open-source/supervision/roboflow-supervision-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1674062891088"
+        >
+    </a>
+</p>
+<br>
+<div align="center">
+    <a href="https://youtube.com/roboflow">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/youtube.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949634652"
+        width="3%"
+        />
+    </a>
+    <img src="https://raw.githubusercontent.com/ultralytics/assets/main/social/logo-transparent.png" width="3%"/>
+    <a href="https://roboflow.com">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/roboflow-app.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949746649"
+        width="3%"
+        />
+    </a>
+    <img src="https://raw.githubusercontent.com/ultralytics/assets/main/social/logo-transparent.png" width="3%"/>
+    <a href="https://www.linkedin.com/company/roboflow-ai/">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/linkedin.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949633691"
+        width="3%"
+        />
+    </a>
+    <img src="https://raw.githubusercontent.com/ultralytics/assets/main/social/logo-transparent.png" width="3%"/>
+    <a href="https://docs.roboflow.com">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/knowledge.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949634511"
+        width="3%"
+        />
+    </a>
+    <img src="https://raw.githubusercontent.com/ultralytics/assets/main/social/logo-transparent.png" width="3%"/>
+    <a href="https://disuss.roboflow.com">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/forum.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949633584"
+        width="3%"
+        />
+    <img src="https://raw.githubusercontent.com/ultralytics/assets/main/social/logo-transparent.png" width="3%"/>
+    <a href="https://blog.roboflow.com">
+        <img
+        src="https://media.roboflow.com/notebooks/template/icons/purple/blog.png?ik-sdk-version=javascript-1.4.3&updatedAt=1672949633605"
+        width="3%"
+        />
+    </a>
+    </a>
+</div>
+
+PolygonZone lets you draw arbitrary polygons on an image and retrieve the coordinates of the points you have drawn.
+
+This application makes it easy to retrieve coordinates for Regions of Interest in computer vision applications.
+
+PolygonZone accompanies [Roboflow Supervision](https://github.com/roboflow/supervision), a Python library with a range of utilities that are useful in computer vision projects.
+
+## Getting Started
+
+To use PolygonZone, open up the [PolygonZone web application](https://roboflow.github.io/polygonzone/). Then:
+
+1. Upload an image onto which you want to draw a polygon.
+2. Click on the points where you want to draw the polygon.
+3. Click "Enter" to save a polygon.
+4. Continue to draw as many polygons as you need.
+5. Copy the NumPy array or JSON object that contains the coordinates of the polygons you have drawn.
+
+You can zoom in and out of an image using the mouse wheel or a laptop track pad.
+
+## Contributing
+
+We welcome contributions to the PolygonZone project. Please see the [Contributing Guidelines](CONTRIBUTING.md) for more information on how you can help to improve this project.
