@@ -2,7 +2,7 @@
     <a align="center" href="" target="_blank">
         <img
         width="850"
-        src="https://media.roboflow.com/open-source/supervision/roboflow-supervision-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1674062891088"
+        src="https://media.roboflow.com/polygonzone/polygonzone-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1676391478845"
         >
     </a>
 </p>
