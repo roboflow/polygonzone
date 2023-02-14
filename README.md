@@ -64,6 +64,10 @@ Please note that PolygonZone is not an annotation tool. It is a tool for retriev
 
 This application is designed for desktop use.
 
+## Demo
+
+https://user-images.githubusercontent.com/37276661/218796838-3a66a61c-ac9d-40f5-97ff-0030a8bdc60d.mov
+
 ## Getting Started 🚀
 
 To use PolygonZone, open up the [PolygonZone web application](https://roboflow.github.io/polygonzone/). Then:
