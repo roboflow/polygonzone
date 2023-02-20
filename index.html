@@ -10,46 +10,56 @@
         <meta name="description" content="Draw polygons on an image and retrieve the coordinates for use in your computer vision projects.">
 
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://roboflow.github.io/polygonzone/">
+        <meta property="og:url" content="https://roboflow.com/polygonzone">
         <meta property="og:title" content="PolygonZone by Roboflow">
         <meta property="og:description" content="Draw polygons on an image and retrieve the coordinates for use in your computer vision projects.">
         <meta property="og:image" content="https://camo.githubusercontent.com/ee21eb5f43b191dbfd154dfbc26f9ce731f43dc66749ca6cde23557f48136a1a/68747470733a2f2f6d656469612e726f626f666c6f772e636f6d2f6f70656e2d736f757263652f7375706572766973696f6e2f726f626f666c6f772d7375706572766973696f6e2d62616e6e65722e706e673f696b2d73646b2d76657273696f6e3d6a6176617363726970742d312e342e33267570646174656441743d31363734303632383931303838">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
-        <meta property="twitter:url" content="https://roboflow.github.io/polygonzone/">
+        <meta property="twitter:url" content="https://roboflow.com/polygonzone">
         <meta property="twitter:title" content="PolygonZone by Roboflow">
         <meta property="twitter:description" content="Draw polygons on an image and retrieve the coordinates for use in your computer vision projects.">
         <meta property="twitter:image" content="https://camo.githubusercontent.com/ee21eb5f43b191dbfd154dfbc26f9ce731f43dc66749ca6cde23557f48136a1a/68747470733a2f2f6d656469612e726f626f666c6f772e636f6d2f6f70656e2d736f757263652f7375706572766973696f6e2f726f626f666c6f772d7375706572766973696f6e2d62616e6e65722e706e673f696b2d73646b2d76657273696f6e3d6a6176617363726970742d312e342e33267570646174656441743d31363734303632383931303838">
     </head>
     <body>
         <main>
-            <img style="max-width: 100%; margin-bottom: 50px;" src="https://media.roboflow.com/polygonzone/polygonzone-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1676391478845" />
-            <h1>Draw Points for Supervision Polygons</h1>
-            <p>Click on the image to add points. Press enter to join the dots.</p>
-            <p class="show_normalized" id="coords" style="display: none;">x: <span id="x"></span> | y: <span id="y"></span></p>
-            <canvas id="canvas"></canvas>
-            <p id="mode">Mode: Polygon (Press <kbd>L</kbd> to switch to Line drawing mode)</p>
-            <a href="" id="clear" class="widgetButton">Clear Polygons</a>
-            <a href="" id="saveImage" class="widgetButton">Save Image</a>
-            <br><br>
-            <div class="show_normalized">
-                <label for="normalize_checkbox">Show Normalized Points from 0-1</label>
-                <input type="checkbox" id="normalize_checkbox" name="normalize_checkbox" value="normalize_checkbox">
+            <img class="banner" src="https://media.roboflow.com/polygonzone/polygonzone-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1676391478845" />
+            <div class="flex">
+                <div class="left">
+                    <h1>Draw points to create polygon coordinates</h1>
+                    <p class="show_normalized" id="coords" style="display: none;">x: <span id="x"></span> | y: <span id="y"></span></p>
+                    <canvas id="canvas"></canvas>
+                    <div style="margin-top: 20px;">
+                        <a href="" id="clear" class="widgetButton">Clear Polygons</a>
+                        <a href="" id="saveImage" class="widgetButton">Save Image</a>
+                        <br>
+                        <p id="mode">Mode: Polygon (Press <kbd>L</kbd> to switch to Line drawing mode)</p>
+                    </div>
+                </div>
+                <div class="right">
+                    <h2>NumPy Points</h2>
+                    <p>Copy the points below into your Python code.</p>
+                    <a href="" id="clipboard" class="widgetButton">Copy Python to Clipboard</a>
+                    <pre id="python">
+                        <code>
+                        </code>
+                    </pre>
+                    <div class="show_normalized" style="margin-bottom: 25px;">
+                        <label for="normalize_checkbox">Show Normalized Points from 0-1</label>
+                        <input type="checkbox" id="normalize_checkbox" name="normalize_checkbox" value="normalize_checkbox">
+                    </div>
+                    <details>
+                        <summary>View JSON Points</summary>
+                        <h2>JSON Points</h2>
+                        <a href="" id="clipboardJSON" class="widgetButton">Copy JSON to Clipboard</a>
+                        <pre id="json">
+                            <code>
+                            </code>
+                        </pre>
+                    </details>
+                </div>
             </div>
-            <h2>NumPy Points</h2>
-            <p>Copy the points below into your Python code.</p>
-            <a href="" id="clipboard" class="widgetButton">Copy Python to Clipboard</a>
-            <pre id="python">
-                <code>
-                </code>
-            </pre>
-            <h2>JSON Points</h2>
-            <a href="" id="clipboardJSON" class="widgetButton">Copy JSON to Clipboard</a>
-            <pre id="json">
-                <code>
-                </code>
-            </pre>
             <h2>Learning Resources</h2>
             <p>Browse our tutorials that walk through using PolygonZone and building projects with zones.</p>
             <div class="grid">

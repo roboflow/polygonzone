@@ -1,5 +1,4 @@
 var color_choices = [
-    "#C7FC00",
     "#FF00FF",
     "#8622FF",
     "#FE0056",
@@ -79,6 +78,8 @@ img.onload = function() {
 
 function drawLine(x1, y1, x2, y2) {
     ctx.beginPath();
+    // set widht
+    ctx.lineWidth = 5;
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.stroke();
@@ -152,10 +153,10 @@ canvas.addEventListener('dragover', function(e) {
     e.preventDefault();
 });
 
-canvas.addEventListener('wheel', function(e) {
-    var delta = Math.sign(e.deltaY);
-    zoom(delta);
-});
+// canvas.addEventListener('wheel', function(e) {
+//     var delta = Math.sign(e.deltaY);
+//     zoom(delta);
+// });
 
 document.querySelector('#saveImage').addEventListener('click', function(e) {
     e.preventDefault();
@@ -257,7 +258,16 @@ window.addEventListener('keydown', function(e) {
         ctx.fill();
         ctx.stroke();
         points = [];
-        rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)];
+        // dont choose a color that has already been chosen
+        var remaining_choices = color_choices.filter(function(x) {
+            return !masterColors.includes(x);
+        });
+        
+        if (remaining_choices.length == 0) {
+            remaining_choices = color_choices;
+        }
+
+        rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
     
         masterColors.push(rgb_color);
     }
