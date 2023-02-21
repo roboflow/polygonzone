@@ -11,6 +11,7 @@ pre {
     height: 200px;
     background-color:rgba(17,24,39,0.1);
     padding: 10px;
+    max-width: 100%;
 }
 body {
     background: rgba(17,24,39,0.4);
