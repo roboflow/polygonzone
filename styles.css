@@ -77,8 +77,14 @@ pre {
     main {
         padding: 3em;
     }
-    .side_by_side {
+    .side_by_side, .flex {
         display: block;
+    }
+    .left, .right {
+        padding: 0;
+    }
+    .left {
+        border-right: 0;
     }
 }
 .controls {
