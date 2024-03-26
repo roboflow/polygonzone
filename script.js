@@ -72,7 +72,6 @@ img.onload = function() {
     canvas.style.height = img.height * scaleFactor + 'px';
     canvas.width = img.width;
     canvas.height = img.height;
-    canvas.style.borderRadius = '10px';
     ctx.drawImage(img, 0, 0);
 };
 
