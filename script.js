@@ -152,10 +152,10 @@ canvas.addEventListener('dragover', function(e) {
     e.preventDefault();
 });
 
-// canvas.addEventListener('wheel', function(e) {
-//     var delta = Math.sign(e.deltaY);
-//     zoom(delta);
-// });
+canvas.addEventListener('wheel', function(e) {
+    var delta = Math.sign(e.deltaY);
+    zoom(delta);
+});
 
 document.querySelector('#saveImage').addEventListener('click', function(e) {
     e.preventDefault();
