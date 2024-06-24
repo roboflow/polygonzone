@@ -32,17 +32,19 @@ var drawMode = "polygon";
 var modeMessage = document.querySelector('#mode');
 var coords = document.querySelector('#coords');
 
+var input = document.querySelector('input[type="file"]');
+
 // if user presses L key, change draw mode to line and change cursor to cross hair
 document.addEventListener('keydown', function(e) {
     if (e.key == 'l') {
         drawMode = "line";
         canvas.style.cursor = 'crosshair';
-        modeMessage.innerHTML = "Draw Mode: Line (press <kbd>p</kbd> to change to polygon drawing)";
+        modeMessage.innerHTML = "Draw Mode: Line (press <kbd>P</kbd> to change to polygon drawing)";
     }
     if (e.key == 'p') {
         drawMode = "polygon";
         canvas.style.cursor = 'crosshair';
-        modeMessage.innerHTML = 'Draw Mode: Polygon (press <kbd>l</kbd> to change to line drawing)';
+        modeMessage.innerHTML = 'Draw Mode: Polygon (press <kbd>L</kbd> to change to line drawing). Press "enter" to complete polygon.';
     }
 });
 
@@ -272,40 +274,19 @@ window.addEventListener('keydown', function(e) {
     }
 });
 
+// moved the logic to add the image file to canvas in 'processAndDisplayImage'
 canvas.addEventListener('drop', function(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
-    var reader = new FileReader();
-    
-    reader.onload = function(event) {
-        // only allow image files
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-
-    var mime_type = file.type;
-
-    if (
-        mime_type != 'image/png' &&
-        mime_type != 'image/jpeg' &&
-        mime_type != 'image/jpg'
-    ) {
-        alert('Only PNG, JPEG, and JPG files are allowed.');
-        return;
-    }
-
-    img.onload = function() {
-        scaleFactor = 0.25;
-        canvas.style.width = img.width * scaleFactor + 'px';
-        canvas.style.height = img.height * scaleFactor + 'px';
-        canvas.width = img.width;
-        canvas.height = img.height;
-        canvas.style.borderRadius = '10px';
-        ctx.drawImage(img, 0, 0);
-    };
-    // show coords
-    document.getElementById('coords').style.display = 'inline-block';
+    processAndDisplayImage(file);
 });
+
+// function to process uploading image file through form instead of drag and drop
+document.querySelector("#upload-file").addEventListener('submit', (e) => {
+    e.preventDefault();
+    var file = input.files[0];
+    processAndDisplayImage(file);
+})
 
 function writePoints(parentPoints) {
     var normalized = [];
@@ -403,3 +384,38 @@ document.querySelector('#normalize_checkbox').addEventListener('change', functio
 
     writePoints(parentPoints);
 });
+
+// This function abstracts away the logic to read and verify the image file, allowing it to be used by both the
+// drop method, and the upload a file form method
+function processAndDisplayImage(file) {
+    var reader = new FileReader();
+    
+    reader.onload = function(event) {
+        // only allow image files
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    var mime_type = file.type;
+
+    if (
+        mime_type != 'image/png' &&
+        mime_type != 'image/jpeg' &&
+        mime_type != 'image/jpg'
+    ) {
+        alert('Only PNG, JPEG, and JPG files are allowed.');
+        return;
+    }
+
+    img.onload = function() {
+        scaleFactor = 0.25;
+        canvas.style.width = img.width * scaleFactor + 'px';
+        canvas.style.height = img.height * scaleFactor + 'px';
+        canvas.width = img.width;
+        canvas.height = img.height;
+        canvas.style.borderRadius = '10px';
+        ctx.drawImage(img, 0, 0);
+    };
+    // show coords
+    document.getElementById('coords').style.display = 'inline-block';
+}
