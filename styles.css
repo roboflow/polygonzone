@@ -167,3 +167,15 @@ pre {
 footer {
     margin-top: 20px;
 }
+
+
+input::file-selector-button {
+    border-radius: 4px;
+    background-color: #7733f4;
+    box-shadow: 0 3px 3px 0 rgb(55 65 81 / 20%);
+    font-family: proxima-nova,sans-serif;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: .5px;
+}
