@@ -12,8 +12,10 @@ pre {
     background-color:rgba(17,24,39,0.1);
     padding: 10px;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-y: scroll;
+    text-wrap: wrap;
 }
+
 body {
     background: rgba(17,24,39,0.4);
     min-height: 50vh;

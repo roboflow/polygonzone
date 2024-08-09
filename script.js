@@ -26,6 +26,9 @@ var scaleSpeed = 0.01;
 var points = [];
 var regions = [];
 
+var currX = 0;
+var currY = 0;
+
 // TODO: store points as 1D array -- better performance than 2D array since each point has exactly two elements
 // https://github.com/mwomick/bench/tree/main/web/js-arrays
 // access masterPoints[n].x by points[n * 2] and masterPoints[n].y by points[n * 2 + 1]
@@ -207,6 +210,9 @@ canvas.addEventListener('mousemove', function(e) {
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
+    currX = x;
+    currY = y;
+
     if (canvas.style.cursor == 'crosshair') {
         //ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
@@ -257,6 +263,7 @@ canvas.addEventListener('mousemove', function(e) {
 });
 
 window.addEventListener('keydown', function(e) {
+    // TODO: consider changing to switch statement
     if (e.key === 'Enter') {
         canvas.style.cursor = 'default';
         // remove line drawn by mouseover
@@ -305,6 +312,62 @@ window.addEventListener('keydown', function(e) {
     }
     else if (e.key === 'Shift') {
         constrainAngles = true;
+    }
+    else if((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        // disable browser undo, e.g. in Safari
+        e.preventDefault();
+        if (points.length > 0) {
+            points.pop();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+            // TODO: could be refactored into a single refresh/redraw function
+            for (var i = 0; i < points.length - 1; i++) {
+                // draw arc around each point
+                ctx.beginPath();
+                ctx.strokeStyle = rgb_color;
+                ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+                // fill with white
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                ctx.stroke();
+                drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            } 
+            if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+                ctx.beginPath();
+                ctx.strokeStyle = rgb_color;
+                ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+                // fill with white
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                ctx.stroke();
+                drawLine(points[points.length - 1][0], points[points.length - 1][1], currX, currY);
+
+                if (points.length == 2 && drawMode == "line") {
+                    console.log("line");
+                    // draw arc around each point
+                    ctx.beginPath();
+                    ctx.strokeStyle = rgb_color;
+                    ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
+                    // fill with white
+                    ctx.fillStyle = 'white';
+                    ctx.fill();
+                    ctx.stroke();
+                    masterPoints.push(points);
+                    points = [];
+                }
+            }
+            var parentPoints = [];
+
+            for (var i = 0; i < masterPoints.length; i++) {
+                parentPoints.push(masterPoints[i]);
+            }
+            // add "points"
+            parentPoints.push(points);
+        
+            writePoints(parentPoints);
+
+            drawAllPolygons();
+        }
     }
 });
 
