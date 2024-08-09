@@ -12,6 +12,8 @@ var color_choices = [
     "#CCCCCC",
 ];
 
+var radiansPer45Degrees = Math.PI / 4;
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 var img = new Image();
@@ -23,23 +25,35 @@ var scaleSpeed = 0.01;
 
 var points = [];
 var regions = [];
+
+// TODO: store points as 1D array -- better performance than 2D array since each point has exactly two elements
+// https://github.com/mwomick/bench/tree/main/web/js-arrays
+// access masterPoints[n].x by points[n * 2] and masterPoints[n].y by points[n * 2 + 1]
 var masterPoints = [];
+
+// TODO: supported verbs are 'moveto', 'lineto', and 'closepath' as defined in the SVG spec
+// https://www.w3.org/TR/SVG/paths.html
+// 'm' marks a new sub-path (polygon or line), 'l' marks a line, 'z' marks end of closed path (i.e. polygon)
+// for now, sub-paths will be treated as distinct paths
+// var masterVerbs = [];
+
 var masterColors = [];
 
 var showNormalized = false;
 var drawMode = "polygon";
+var constrainAngles = false;
 
 var modeMessage = document.querySelector('#mode');
 var coords = document.querySelector('#coords');
 
 // if user presses L key, change draw mode to line and change cursor to cross hair
 document.addEventListener('keydown', function(e) {
-    if (e.key == 'l') {
+    if (e.key == 'l' || e.key == 'L') {
         drawMode = "line";
         canvas.style.cursor = 'crosshair';
         modeMessage.innerHTML = "Draw Mode: Line (press <kbd>p</kbd> to change to polygon drawing)";
     }
-    if (e.key == 'p') {
+    if (e.key == 'p' || e.key == 'P') {
         drawMode = "polygon";
         canvas.style.cursor = 'crosshair';
         modeMessage.innerHTML = 'Draw Mode: Polygon (press <kbd>l</kbd> to change to line drawing)';
@@ -169,13 +183,27 @@ document.querySelector('#saveImage').addEventListener('click', function(e) {
 canvas.addEventListener('mousemove', function(e) {
     var x = getScaledCoords(e)[0];
     var y = getScaledCoords(e)[1];
-    // round
+
     x = Math.round(x);
     y = Math.round(y);
 
     // update x y coords
     var xcoord = document.querySelector('#x');
     var ycoord = document.querySelector('#y');
+
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
+
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
@@ -269,6 +297,20 @@ window.addEventListener('keydown', function(e) {
         rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
     
         masterColors.push(rgb_color);
+    }
+    else if (e.key === 'Escape') {
+        // TODO: change to line and move if in polygon mode
+        // if (drawMode == 'polygon') {
+        // }
+    }
+    else if (e.key === 'Shift') {
+        constrainAngles = true;
+    }
+});
+
+window.addEventListener('keyup', function(e) {
+    if (e.key === 'Shift') {
+        constrainAngles = false;
     }
 });
 
@@ -367,6 +409,19 @@ canvas.addEventListener('click', function(e) {
     var y = getScaledCoords(e)[1];
     x = Math.round(x);
     y = Math.round(y);
+
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
 
     points.push([x, y]);
     ctx.beginPath();
