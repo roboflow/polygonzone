@@ -34,10 +34,10 @@ var currY = 0;
 // access masterPoints[n].x by points[n * 2] and masterPoints[n].y by points[n * 2 + 1]
 var masterPoints = [];
 
-// TODO: supported verbs are 'moveto', 'lineto', and 'closepath' as defined in the SVG spec
+// TODO: support verbs 'moveto', 'lineto', and 'closepath' as defined in the SVG spec
 // https://www.w3.org/TR/SVG/paths.html
 // 'm' marks a new sub-path (polygon or line), 'l' marks a line, 'z' marks end of closed path (i.e. polygon)
-// for now, sub-paths will be treated as distinct paths
+// possibly treat sub-paths as distinct paths?
 // var masterVerbs = [];
 
 var masterColors = [];
@@ -146,6 +146,7 @@ function clearall() {
     ctx.drawImage(img, 0, 0);
     points = [];
     masterPoints = [];
+    masterColors = [];
     document.querySelector('#json').innerHTML = '';
     document.querySelector('#python').innerHTML = '';
 }
@@ -283,8 +284,10 @@ window.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         canvas.style.cursor = 'default';
         masterPoints.push(points);
+        masterColors.push(rgb_color);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(img, 0, 0);
+        
         drawAllPolygons();
         points = [];
 
@@ -298,8 +301,6 @@ window.addEventListener('keydown', function(e) {
         }
 
         rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
-    
-        masterColors.push(rgb_color);
     }
     else if (e.key === 'Escape') {
         // TODO: change to line and move if in polygon mode
@@ -485,12 +486,7 @@ canvas.addEventListener('click', function(e) {
     points.push([x, y]);
     ctx.beginPath();
     ctx.strokeStyle = rgb_color;
-    // add rgb_color to masterColors
     
-    if (masterColors.length == 0) {
-        masterColors.push(rgb_color);
-    }
-
     ctx.arc(x, y, 155, 0, 2 * Math.PI);
     // concat all points into one array
     var parentPoints = [];
