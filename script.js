@@ -69,6 +69,7 @@ function clipboard(selector) {
 }
 
 function zoom(clicks) {
+    // TODO: might want to redraw screen to avoid blurring
     // if w > 60em, stop
     if ((scaleFactor + clicks * scaleSpeed) * img.width > 40 * 16) {
         return;
@@ -253,28 +254,7 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.fill();
             ctx.stroke();
             drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
-
-            if (points.length == 2 && drawMode == "line") {
-                console.log("line");
-                // draw arc around each point
-                ctx.beginPath();
-                ctx.strokeStyle = rgb_color;
-                ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
-                // fill with white
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                ctx.stroke();
-                masterPoints.push(points);
-                points = [];
-            }
         }
-        var parentPoints = [];
-
-        for (var i = 0; i < masterPoints.length; i++) {
-            parentPoints.push(masterPoints[i]);
-        }
-        parentPoints.push(points);
-
         drawAllPolygons();
     }
 });
@@ -304,12 +284,16 @@ function closePath() {
 window.addEventListener('keydown', function(e) {
     // TODO: consider changing to switch statement
     if (e.key === 'Enter') {
-        closePath();
+        if (drawMode == "polygon" && points.length > 2) {
+            closePath();
+        }
     }
     else if (e.key === 'Escape') {
-        // TODO: change to line and move if in polygon mode
-        // if (drawMode == 'polygon') {
-        // }
+        // For now, cancel shape...consider behavior later (e.g. cancel last point, cancel all)
+        points = [];
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        drawAllPolygons();
     }
     else if (e.key === 'Shift') {
         constrainAngles = true;
@@ -333,7 +317,7 @@ window.addEventListener('keydown', function(e) {
                 ctx.stroke();
                 drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             } 
-            if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+            if ((drawMode == "polygon" && points.length > 0) || (drawMode == "line" && points.length == 1)) {
                 ctx.beginPath();
                 ctx.strokeStyle = rgb_color;
                 ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
@@ -342,31 +326,16 @@ window.addEventListener('keydown', function(e) {
                 ctx.fill();
                 ctx.stroke();
                 drawLine(points[points.length - 1][0], points[points.length - 1][1], currX, currY);
-
-                if (points.length == 2 && drawMode == "line") {
-                    console.log("line");
-                    // draw arc around each point
-                    ctx.beginPath();
-                    ctx.strokeStyle = rgb_color;
-                    ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
-                    // fill with white
-                    ctx.fillStyle = 'white';
-                    ctx.fill();
-                    ctx.stroke();
-                    masterPoints.push(points);
-                    points = [];
-                }
             }
             var parentPoints = [];
 
             for (var i = 0; i < masterPoints.length; i++) {
                 parentPoints.push(masterPoints[i]);
             }
+
             // add "points"
             parentPoints.push(points);
-        
             writePoints(parentPoints);
-
             drawAllPolygons();
         }
     }
@@ -464,11 +433,7 @@ return `{"x": ${point[0]}, "y": ${point[1]}}`;
 canvas.addEventListener('click', function(e) {
     // set cursor to crosshair
     canvas.style.cursor = 'crosshair';
-    // if line mode and two points have been drawn, add to masterPoints
-    if (drawMode == 'line' && points.length == 2) {
-        masterPoints.push(points);
-        points = [];
-    }
+
     var x = getScaledCoords(e)[0];
     var y = getScaledCoords(e)[1];
     x = Math.round(x);
@@ -496,12 +461,17 @@ canvas.addEventListener('click', function(e) {
         }
     }
 
-
     points.push([x, y]);
-    ctx.beginPath();
-    ctx.strokeStyle = rgb_color;
+
+    if(drawMode == "line" && points.length == 2) {
+        closePath();
+    }
+    else {
+        ctx.beginPath();
+        ctx.strokeStyle = rgb_color;
+    }
     
-    ctx.arc(x, y, 155, 0, 2 * Math.PI);
+    // ctx.arc(x, y, 155, 0, 2 * Math.PI);
     // concat all points into one array
     var parentPoints = [];
 
@@ -509,7 +479,9 @@ canvas.addEventListener('click', function(e) {
         parentPoints.push(masterPoints[i]);
     }
     // add "points"
-    parentPoints.push(points);
+    if(points.length > 0) {
+        parentPoints.push(points);
+    }
 
     writePoints(parentPoints);
 });
