@@ -169,8 +169,24 @@ canvas.addEventListener('dragover', function(e) {
     e.preventDefault();
 });
 
+/* 
+    TODO: do we really want to change the canvas size or should keep the same size and zoom in with panning?
+    Also, might want to add support for touchpad. 
+*/
 canvas.addEventListener('wheel', function(e) {
-    var delta = Math.sign(e.deltaY);
+    // do not scroll page, only zoom canvas
+    e.preventDefault();
+
+    // scrolling is clockwise
+    var delta = -Math.sign(e.deltaY);
+
+    // users using natural scrolling still expect zooming in to be clockwise
+    // we can work with this in Safari 10.0+
+    if (e.webkitDirectionInvertedFromDevice) {
+        console.log('inverted');
+        delta = -delta;
+    }
+
     zoom(delta);
 });
 
@@ -271,7 +287,7 @@ window.addEventListener('keydown', function(e) {
         ctx.drawImage(img, 0, 0);
         drawAllPolygons();
         points = [];
-        
+
         // dont choose a color that has already been chosen
         var remaining_choices = color_choices.filter(function(x) {
             return !masterColors.includes(x);
