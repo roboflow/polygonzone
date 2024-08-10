@@ -266,32 +266,12 @@ window.addEventListener('keydown', function(e) {
     // TODO: consider changing to switch statement
     if (e.key === 'Enter') {
         canvas.style.cursor = 'default';
-        // remove line drawn by mouseover
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // join the dots
-        drawLine(points[0][0], points[0][1], points[points.length - 1][0], points[points.length - 1][1]);
-        // fill polygon with color
-        if (drawMode == 'polygon') {
-            ctx.beginPath();
-            ctx.moveTo(points[0][0], points[0][1]);
-            ctx.fillStyle = opaque_color;
-            for (var i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i][0], points[i][1]);
-            }
-            ctx.closePath();
-            ctx.fill();
-            // draw line connecting last two points
-        }
         masterPoints.push(points);
-        // draw arc around last point
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[points.length - 1][0], points[points.length - 1][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        drawAllPolygons();
         points = [];
+        
         // dont choose a color that has already been chosen
         var remaining_choices = color_choices.filter(function(x) {
             return !masterColors.includes(x);
