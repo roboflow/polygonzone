@@ -279,28 +279,32 @@ canvas.addEventListener('mousemove', function(e) {
     }
 });
 
+function closePath() {
+    canvas.style.cursor = 'default';
+    masterPoints.push(points);
+    masterColors.push(rgb_color);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    drawAllPolygons();
+    points = [];
+
+    // dont choose a color that has already been chosen
+    var remaining_choices = color_choices.filter(function(x) {
+        return !masterColors.includes(x);
+    });
+    
+    if (remaining_choices.length == 0) {
+        remaining_choices = color_choices;
+    }
+
+    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
+}
+
 window.addEventListener('keydown', function(e) {
     // TODO: consider changing to switch statement
     if (e.key === 'Enter') {
-        canvas.style.cursor = 'default';
-        masterPoints.push(points);
-        masterColors.push(rgb_color);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        
-        drawAllPolygons();
-        points = [];
-
-        // dont choose a color that has already been chosen
-        var remaining_choices = color_choices.filter(function(x) {
-            return !masterColors.includes(x);
-        });
-        
-        if (remaining_choices.length == 0) {
-            remaining_choices = color_choices;
-        }
-
-        rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
+        closePath();
     }
     else if (e.key === 'Escape') {
         // TODO: change to line and move if in polygon mode
@@ -482,6 +486,16 @@ canvas.addEventListener('click', function(e) {
         x = Math.round(new_x);
         y = Math.round(new_y);
     }
+
+    if (points.length > 2 && drawMode == "polygon") {
+        distX = x - points[0][0];
+        distY = y - points[0][1];
+        if(Math.sqrt(distX * distX + distY * distY) <= 5) {
+            closePath();
+            return;
+        }
+    }
+
 
     points.push([x, y]);
     ctx.beginPath();
