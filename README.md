@@ -74,7 +74,7 @@ To use PolygonZone, open up the [PolygonZone web application](https://roboflow.g
 
 1. Upload an image onto which you want to draw a polygon.
 2. Click on the points where you want to draw the polygon.
-3. Click "Enter" to save a polygon.
+3. Click on the intial point or press "Enter" to save a polygon.
 4. Continue to draw as many polygons as you need.
 5. Copy the NumPy array or JSON object that contains the coordinates of the polygons you have drawn.
 
