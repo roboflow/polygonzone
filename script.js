@@ -26,25 +26,14 @@ var regions = [];
 var masterPoints = [];
 var masterColors = [];
 
+var drawMode
+setDrawMode('polygon')
+
 var showNormalized = false;
-var drawMode = "polygon";
 
 var modeMessage = document.querySelector('#mode');
 var coords = document.querySelector('#coords');
 
-// if user presses L key, change draw mode to line and change cursor to cross hair
-document.addEventListener('keydown', function(e) {
-    if (e.key == 'l') {
-        drawMode = "line";
-        canvas.style.cursor = 'crosshair';
-        modeMessage.innerHTML = "Draw Mode: Line (press <kbd>p</kbd> to change to polygon drawing)";
-    }
-    if (e.key == 'p') {
-        drawMode = "polygon";
-        canvas.style.cursor = 'crosshair';
-        modeMessage.innerHTML = 'Draw Mode: Polygon (press <kbd>l</kbd> to change to line drawing)';
-    }
-});
 
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
@@ -177,19 +166,6 @@ function getParentPoints () {
     return parentPoints;
 }
 
-function clearall() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0);
-    points = [];
-    masterPoints = [];
-    document.querySelector('#json').innerHTML = '';
-    document.querySelector('#python').innerHTML = '';
-}
-
-document.querySelector('#clear').addEventListener('click', function(e) {
-    e.preventDefault();
-    clearall();
-});
 
 document.querySelector('#clipboard').addEventListener('click', function(e) {
     e.preventDefault();
@@ -208,14 +184,6 @@ canvas.addEventListener('dragover', function(e) {
 canvas.addEventListener('wheel', function(e) {
     var delta = Math.sign(e.deltaY);
     zoom(delta);
-});
-
-document.querySelector('#saveImage').addEventListener('click', function(e) {
-    e.preventDefault();
-    var link = document.createElement('a');
-    link.download = 'image.png';
-    link.href = canvas.toDataURL();
-    link.click();
 });
 
 // on canvas hover, if cursor is crosshair, draw line from last point to cursor
@@ -239,49 +207,6 @@ canvas.addEventListener('mousemove', function(e) {
 });
 
 
-
-window.addEventListener('keydown', function(e) {
-    e.stopImmediatePropagation()
-    let validKey = false
-
-    if (e.key === 'Enter') {
-        validKey = true
-        canvas.style.cursor = 'default';
-
-        // save current polygon points
-        masterPoints.push(points);
-        points = [];
-
-        // dont choose a color that has already been chosen
-        var remaining_choices = color_choices.filter(function(x) {
-            return !masterColors.includes(x);
-        });
-        
-        if (remaining_choices.length == 0) {
-            remaining_choices = color_choices;
-        }
-
-        rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
-        masterColors.push(rgb_color);
-    }
-
-    if (e.key === 'Escape') {
-        validKey = true
-        points = []
-    }
-
-    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
-        validKey = true
-        points.pop()
-    }
-
-    if (validKey) {
-        drawCurrentPolygon()
-        drawAllPolygons();
-        var parentPoints = getParentPoints();
-        writePoints(parentPoints);
-    }
-});
 
 canvas.addEventListener('drop', function(e) {
     e.preventDefault();
@@ -404,8 +329,145 @@ canvas.addEventListener('click', function(e) {
     writePoints(parentPoints);
 });
 
-document.querySelector('#normalize_checkbox').addEventListener('change', function(e) {
+document.querySelector('#normalize-checkbox').addEventListener('change', function(e) {
     showNormalized = e.target.checked;
     var parentPoints = getParentPoints();
     writePoints(parentPoints);
 });
+
+function setDrawMode(mode) {
+    drawMode = mode
+    canvas.style.cursor = 'crosshair';
+    document.querySelectorAll('.t-mode').forEach(el => el.classList.remove('active'))
+    document.querySelector(`#mode-${mode}`).classList.add('active')
+}
+
+document.querySelector('#mode-polygon').addEventListener('click', function(e) {
+    setDrawMode('polygon')
+})
+
+document.querySelector('#mode-line').addEventListener('click', function(e) {
+    setDrawMode('line')
+})
+
+document.addEventListener('keydown', function(e) {
+    if (e.key == 'l') {
+        setDrawMode('line')
+    }
+    if (e.key == 'p') {
+        setDrawMode('polygon')
+    }
+})
+
+function draw () {
+    drawCurrentPolygon()
+    drawAllPolygons()
+    var parentPoints = getParentPoints()
+    writePoints(parentPoints)
+}
+
+function highlightButtonInteraction (buttonId) {
+    document.querySelector(buttonId).classList.add('active')
+    setTimeout(() => document.querySelector(buttonId).classList.remove('active'), 100)
+}
+
+function undo () {
+    highlightButtonInteraction('#undo')
+
+    points.pop()
+    draw()
+}
+
+document.querySelector('#undo').addEventListener('click', function(e) {
+    undo()
+})
+
+function discardCurrentPolygon () {
+    highlightButtonInteraction('#discard-current')
+
+    points = []
+    draw()
+}
+
+document.querySelector('#discard-current').addEventListener('click', function(e) {
+    discardCurrentPolygon()
+})
+
+function clearAll() {
+    highlightButtonInteraction('#clear')
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(img, 0, 0)
+
+    points = []
+    masterPoints = []
+    document.querySelector('#json').innerHTML = ''
+    document.querySelector('#python').innerHTML = ''
+}
+
+document.querySelector('#clear').addEventListener('click', function(e) {
+    clearAll()
+})
+
+function saveImage () {
+    highlightButtonInteraction('#save-image')
+
+    var link = document.createElement('a')
+    link.download = 'image.png'
+    link.href = canvas.toDataURL()
+    link.click()
+}
+
+document.querySelector('#save-image').addEventListener('click', function(e) {
+    saveImage()
+})
+
+function completeCurrentPolygon () {
+    canvas.style.cursor = 'default'
+
+    // save current polygon points
+    masterPoints.push(points)
+    points = []
+
+    // dont choose a color that has already been chosen
+    var remaining_choices = color_choices.filter(function(x) {
+        return !masterColors.includes(x)
+    });
+    
+    if (remaining_choices.length == 0) {
+        remaining_choices = color_choices
+    }
+
+    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)]
+    masterColors.push(rgb_color)
+
+    draw()
+}
+
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+
+        undo()
+    }
+
+    if (e.key === 'Escape') {
+        discardCurrentPolygon()
+    }
+
+    if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
+        clearAll()
+    }
+
+    if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+
+        saveImage()
+    }
+
+    if (e.key === 'Enter') {
+        completeCurrentPolygon()
+    }
+})

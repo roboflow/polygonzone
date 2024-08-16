@@ -34,14 +34,14 @@
                     <p class="show_normalized" id="coords" style="display: none;">x: <span id="x"></span> | y: <span id="y"></span></p>
                     <div class="taskbar-container">
                         <div class="taskbar">
-                            <div class="t-icon active">
+                            <div class="t-icon t-mode" id="mode-polygon">
                                 <i class="fa-solid fa-draw-polygon"></i>
                                 <span class="ti-caption">
                                     <span>Polygon Mode</span>
                                     <span>(P)</span>
                                 </span>
                             </div>
-                            <div class="t-icon">
+                            <div class="t-icon t-mode" id="mode-line">
                                 <i class="fa-solid fa-arrows-left-right"></i>
                                 <span class="ti-caption">
                                     <span>Line Mode</span>
@@ -49,14 +49,14 @@
                                 </span>
                             </div>
                             <div class="t-divider"></div>
-                            <div class="t-icon">
+                            <div class="t-icon" id="undo">
                                 <i class="fa-solid fa-rotate-left"></i>
                                 <span class="ti-caption">
                                     <span>Undo</span>
                                     <span>(Ctrl/⌘-Z)</span>
                                 </span>
                             </div>                        
-                            <div class="t-icon">
+                            <div class="t-icon" id="discard-current">
                                 <i class="fa-solid fa-xmark"></i>
                                 <span class="ti-caption">
                                     <span>Discard current</span>
@@ -64,27 +64,23 @@
                                 </span>
                             </div>
                             <div class="t-divider"></div>
-                            <div class="t-icon">
+                            <div class="t-icon" id="clear">
                                 <i class="fa-solid fa-trash-can"></i>
                                 <span class="ti-caption">
-                                    <span>Clear all<br>polygons</span>
+                                    <span>Clear all polygons</span>
+                                    <span>(Ctrl/⌘-E)</span>
                                 </span>
                             </div>
-                            <div class="t-icon">
+                            <div class="t-icon" id="save-image">
                                 <i class="fa-solid fa-floppy-disk"></i>
                                 <span class="ti-caption">
                                     <span>Save image</span>
+                                    <span>(Ctrl/⌘-S)</span>
                                 </span>
                             </div>
                         </div>
                     </div>
                     <canvas id="canvas"></canvas>
-                    <div style="margin-top: 20px; display:none">
-                        <a href="" id="clear" class="widgetButton">Clear Polygons</a>
-                        <a href="" id="saveImage" class="widgetButton">Save Image</a>
-                        <br>
-                        <p id="mode">Mode: Polygon (Press <kbd>L</kbd> to switch to Line drawing mode)</p>
-                    </div>
                 </div>
                 <div class="right">
                     <div class="how-to">
@@ -106,8 +102,8 @@
                         </code>
                     </pre>
                     <div class="show_normalized mb-3">
-                        <label for="normalize_checkbox">Show Normalized Points from 0-1</label>
-                        <input type="checkbox" id="normalize_checkbox" name="normalize_checkbox" value="normalize_checkbox">
+                        <label for="normalize-checkbox">Show Normalized Points from 0-1</label>
+                        <input type="checkbox" id="normalize-checkbox" name="normalize-checkbox" value="normalize-checkbox">
                     </div>
                     <details>
                         <summary>View JSON Points</summary>
