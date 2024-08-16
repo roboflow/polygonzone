@@ -31,59 +31,68 @@
             <div class="flex">
                 <div class="left">
                     <h1>Draw points to create polygon coordinates</h1>
-                    <p class="show_normalized" id="coords" style="display: none;">x: <span id="x"></span> | y: <span id="y"></span></p>
                     <div class="taskbar-container">
-                        <div class="taskbar">
-                            <div class="t-icon t-mode" id="mode-polygon">
-                                <i class="fa-solid fa-draw-polygon"></i>
-                                <span class="ti-caption">
-                                    <span>Polygon Mode</span>
-                                    <span>(P)</span>
-                                </span>
+                        <div class="tc-container">
+                            <div class="taskbar">
+                                <div class="t-icon t-mode" id="mode-polygon">
+                                    <i class="fa-solid fa-draw-polygon"></i>
+                                    <span class="ti-caption">
+                                        <span>Polygon Mode</span>
+                                        <span>(P)</span>
+                                    </span>
+                                </div>
+                                <div class="t-icon t-mode" id="mode-line">
+                                    <i class="fa-solid fa-arrows-left-right"></i>
+                                    <span class="ti-caption">
+                                        <span>Line Mode</span>
+                                        <span>(L)</span>
+                                    </span>
+                                </div>
+                                <div class="t-divider"></div>
+                                <div class="t-icon" id="undo">
+                                    <i class="fa-solid fa-rotate-left"></i>
+                                    <span class="ti-caption">
+                                        <span>Undo</span>
+                                        <span>(Ctrl/⌘-Z)</span>
+                                    </span>
+                                </div>                        
+                                <div class="t-icon" id="discard-current">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    <span class="ti-caption">
+                                        <span>Discard current</span>
+                                        <span>(Esc)</span>
+                                    </span>
+                                </div>
+                                <div class="t-divider"></div>
+                                <div class="t-icon" id="clear">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span class="ti-caption">
+                                        <span>Clear all polygons</span>
+                                        <span>(Ctrl/⌘-E)</span>
+                                    </span>
+                                </div>
+                                <div class="t-icon" id="save-image">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span class="ti-caption">
+                                        <span>Save image</span>
+                                        <span>(Ctrl/⌘-S)</span>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="t-icon t-mode" id="mode-line">
-                                <i class="fa-solid fa-arrows-left-right"></i>
-                                <span class="ti-caption">
-                                    <span>Line Mode</span>
-                                    <span>(L)</span>
-                                </span>
-                            </div>
-                            <div class="t-divider"></div>
-                            <div class="t-icon" id="undo">
-                                <i class="fa-solid fa-rotate-left"></i>
-                                <span class="ti-caption">
-                                    <span>Undo</span>
-                                    <span>(Ctrl/⌘-Z)</span>
-                                </span>
-                            </div>                        
-                            <div class="t-icon" id="discard-current">
-                                <i class="fa-solid fa-xmark"></i>
-                                <span class="ti-caption">
-                                    <span>Discard current</span>
-                                    <span>(Esc)</span>
-                                </span>
-                            </div>
-                            <div class="t-divider"></div>
-                            <div class="t-icon" id="clear">
-                                <i class="fa-solid fa-trash-can"></i>
-                                <span class="ti-caption">
-                                    <span>Clear all polygons</span>
-                                    <span>(Ctrl/⌘-E)</span>
-                                </span>
-                            </div>
-                            <div class="t-icon" id="save-image">
-                                <i class="fa-solid fa-floppy-disk"></i>
-                                <span class="ti-caption">
-                                    <span>Save image</span>
-                                    <span>(Ctrl/⌘-S)</span>
+                            <div class="coordinates">
+                                <span class="cc-title">Coordinates</span>
+                                <span>
+                                    <span class="cc-coord">x: <span class="cc-value" id="x">---</span> | </span>
+                                    <span class="cc-coord">y: <span class="cc-value" id="y">---</span></span>
                                 </span>
                             </div>
                         </div>
                     </div>
+
                     <canvas id="canvas"></canvas>
                 </div>
                 <div class="right">
-                    <div class="how-to">
+                    <div class="how-to section">
                         <h2>How to use</h2>
                         <ol class="ta-left">
                             <li>Drop an image to the indicated area</li>
@@ -94,47 +103,52 @@
                             <li>To finish, copy the numpy points to your clipboard</li>
                         </ol>
                     </div>
-                    <h2>NumPy Points</h2>
-                    <p>Copy the points below into your Python code.</p>
-                    <a href="" id="clipboard" class="widgetButton">Copy Python to Clipboard</a>
-                    <pre id="python">
-                        <code>
-                        </code>
-                    </pre>
-                    <div class="show_normalized mb-3">
-                        <label for="normalize-checkbox">Show Normalized Points from 0-1</label>
-                        <input type="checkbox" id="normalize-checkbox" name="normalize-checkbox" value="normalize-checkbox">
-                    </div>
-                    <details>
-                        <summary>View JSON Points</summary>
-                        <h2>JSON Points</h2>
-                        <a href="" id="clipboardJSON" class="widgetButton">Copy JSON to Clipboard</a>
-                        <pre id="json">
+                    <div class="points-output section">
+                        <h2>NumPy Points</h2>
+                        <p>Copy the points below into your Python code.</p>
+                        <a href="" id="clipboard" class="widgetButton">Copy Python to Clipboard</a>
+                        <pre id="python">
                             <code>
                             </code>
                         </pre>
-                    </details>
+                        <div class="show_normalized mb-3">
+                            <label for="normalize-checkbox">Show Normalized Points from 0-1</label>
+                            <input type="checkbox" id="normalize-checkbox" name="normalize-checkbox" value="normalize-checkbox">
+                        </div>
+                        <details>
+                            <summary>View JSON Points</summary>
+                            <h2>JSON Points</h2>
+                            <a href="" id="clipboardJSON" class="widgetButton">Copy JSON to Clipboard</a>
+                            <pre id="json">
+                                <code>
+                                </code>
+                            </pre>
+                        </details>
+                    </div>
+                    <div class="learning-resources section">
+                        <h2>Learning Resources</h2>
+                        <p>Browse our tutorials that walk through using PolygonZone and building projects with zones.</p>
+                        <div class="grid">
+                            <div class="card">
+                                <a href="https://www.youtube.com/watch?v=l_kf9CfZ_8M">
+                                    <img src="https://i.ytimg.com/vi/l_kf9CfZ_8M/maxresdefault.jpg" />
+                                    <h3>Count People in Zone Using YOLOv5, YOLOv8, and Detectron2</h3>
+                                    <p>Learn how to use Roboflow supervision to count people in a zone using YOLOv5, YOLOv8, and Detectron2.</p>
+                                </a>
+                            </div>
+                            <div class="card">
+                                <a href="https://blog.roboflow.com/polygonzone">
+                                    <img src="https://media.roboflow.com/polygonzone/thumbnail.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676366680992" />
+                                    <h3>How to Use PolygonZone</h3>
+                                    <p>Learn how to use PolygonZone to create polygons for your computer vision projects.</p>
+                                </a>
+                            </div>
+                        </div>
+                        <a href="https://blog.roboflow.com" class="widgetButton">Explore More Tutorials</a>
+                    </div>
                 </div>
             </div>
-            <h2>Learning Resources</h2>
-            <p>Browse our tutorials that walk through using PolygonZone and building projects with zones.</p>
-            <div class="grid">
-                <div class="card">
-                    <a href="https://www.youtube.com/watch?v=l_kf9CfZ_8M">
-                        <img src="https://i.ytimg.com/vi/l_kf9CfZ_8M/maxresdefault.jpg" />
-                        <h3>Count People in Zone Using YOLOv5, YOLOv8, and Detectron2</h3>
-                        <p>Learn how to use Roboflow supervision to count people in a zone using YOLOv5, YOLOv8, and Detectron2.</p>
-                    </a>
-                </div>
-                <div class="card">
-                    <a href="https://blog.roboflow.com/polygonzone">
-                        <img src="https://media.roboflow.com/polygonzone/thumbnail.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676366680992" />
-                        <h3>How to Use PolygonZone</h3>
-                        <p>Learn how to use PolygonZone to create polygons for your computer vision projects.</p>
-                    </a>
-                </div>
-            </div>
-            <a href="https://blog.roboflow.com" class="widgetButton">Explore More Tutorials</a>
+
             <footer>
                 <p>Made with ❤️ by <a href="https://roboflow.com">Roboflow.</a> <a href="https://github.com/roboflow/polygonzone">View source code.</a></p>
             </footer>

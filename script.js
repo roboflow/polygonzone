@@ -56,7 +56,7 @@ function zoom(clicks) {
 // placeholder image
 img.src = 'https://assets.website-files.com/5f6bc60e665f54545a1e52a5/63d3f236a6f0dae14cdf0063_drag-image-here.png';
 img.onload = function() {
-    scaleFactor = 0.5;
+    scaleFactor = 0.69;
     canvas.style.width = img.width * scaleFactor + 'px';
     canvas.style.height = img.height * scaleFactor + 'px';
     canvas.width = img.width;

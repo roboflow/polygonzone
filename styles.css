@@ -50,12 +50,12 @@ main {
     display: flex;
 }
 .left {
-    flex: 0 50%;
+    flex: 0 60%;
     padding: 0 2em;
     border-right: 1px solid #e5e7eb;
 }
 .right {
-    flex: 0 50%;
+    flex: 0 40%;
     padding: 0 2em;
 }
 pre {
@@ -155,17 +155,13 @@ pre {
     line-height: 1.4;
     font-weight: 400;
 }
-.show_normalized {
-    background-color: #5400ec;
-    opacity: 0.8;
-    color: white;
-    font-weight: 600;
-    display: inline-block;
-    padding: 15px;
-    border-radius: 10px;
-}
+
 footer {
-    margin-top: 20px;
+    margin-top: 50px;
+}
+
+.section {
+    margin-bottom: 50px;
 }
 
 li {
@@ -175,9 +171,14 @@ li {
 /* Taskbar */
 .taskbar-container {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
     margin-bottom: 24px;
     margin-top: 32px;
+}
+
+.taskbar-container .tc-container {
+    width: 700px;
 }
 
 .taskbar {
@@ -186,7 +187,6 @@ li {
     color: #f1edf8;
 
     border-radius: 5px;
-    width: 700px;
     padding: 6px;
 
     justify-content:space-around;
@@ -223,6 +223,36 @@ li {
 .taskbar .t-divider {
     background-color: #8145f1;
     width: 1px;
+}
+
+/* Coordinates */
+.coordinates {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    width: 130px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    margin-top: 8px;
+    
+    font-size: 12px;
+    box-shadow: 0 2px 3px 1px rgb(0 0 0 / 20%);
+    background-color: #fbf9ff;
+}
+
+.coordinates .cc-title {
+    margin-bottom: 4px;
+    color: #5400ec;
+}
+
+.coordinates .cc-coord {
+    margin-bottom: 2px;
+    color: #989898;
+}
+
+.coordinates .cc-value {
+    color: #000;
 }
 
 
