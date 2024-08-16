@@ -360,9 +360,10 @@ function writePoints(parentPoints) {
         parentPoints = normalized;
     }
 
-    var hasPoints = parentPoints?.some(point => point?.length);
+    // clean empty points
+    parentPoints = parentPoints.filter(points => !!points.length);
 
-    if (!hasPoints) {
+    if (!parentPoints.length) {
         document.querySelector('#python').innerHTML = '';
         document.querySelector('#json').innerHTML;
         return;
