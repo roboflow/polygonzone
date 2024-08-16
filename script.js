@@ -91,6 +91,50 @@ function getScaledCoords(e) {
     return [x / scaleFactor, y / scaleFactor];
 }
 
+function drawCurrentPolygon (cursorX, cursorY) {
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    for (var i = 0; i < points.length - 1; i++) {
+        // draw arc around each point
+        ctx.beginPath();
+        ctx.strokeStyle = rgb_color;
+        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+        // fill with white
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.stroke();
+        drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+    }
+    
+    if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+        ctx.beginPath();
+        ctx.strokeStyle = rgb_color;
+        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+        // fill with white
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.stroke();
+
+        if (cursorX && cursorY) {
+            drawLine(points[points.length - 1][0], points[points.length - 1][1], cursorX, cursorY);
+        }
+
+        if (points.length == 2 && drawMode == "line") {
+            console.log("line");
+            // draw arc around each point
+            ctx.beginPath();
+            ctx.strokeStyle = rgb_color;
+            ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
+            masterPoints.push(points);
+            points = [];
+        }
+    }
+}
+
 function drawAllPolygons () {
     // draw all points for previous regions
     for (var i = 0; i < masterPoints.length; i++) {
@@ -122,6 +166,15 @@ function drawAllPolygons () {
         ctx.closePath();
         ctx.fill();
     }
+}
+
+function getParentPoints () {
+    var parentPoints = [];
+    for (var i = 0; i < masterPoints.length; i++) {
+        parentPoints.push(masterPoints[i]);
+    }
+    parentPoints.push(points);
+    return parentPoints;
 }
 
 function clearall() {
@@ -180,55 +233,15 @@ canvas.addEventListener('mousemove', function(e) {
     ycoord.innerHTML = y;
 
     if (canvas.style.cursor == 'crosshair') {
-        //ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-        for (var i = 0; i < points.length - 1; i++) {
-            // draw arc around each point
-            ctx.beginPath();
-            ctx.strokeStyle = rgb_color;
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
-            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
-        }
-        if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
-            ctx.beginPath();
-            ctx.strokeStyle = rgb_color;
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
-
-            if (points.length == 2 && drawMode == "line") {
-                console.log("line");
-                // draw arc around each point
-                ctx.beginPath();
-                ctx.strokeStyle = rgb_color;
-                ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
-                // fill with white
-                ctx.fillStyle = 'white';
-                ctx.fill();
-                ctx.stroke();
-                masterPoints.push(points);
-                points = [];
-            }
-        }
-        var parentPoints = [];
-
-        for (var i = 0; i < masterPoints.length; i++) {
-            parentPoints.push(masterPoints[i]);
-        }
-        parentPoints.push(points);
-
+        drawCurrentPolygon(x, y)
         drawAllPolygons();
     }
 });
 
+
+
 window.addEventListener('keydown', function(e) {
+    e.stopImmediatePropagation()
     if (e.key === 'Enter') {
         canvas.style.cursor = 'default';
         // remove line drawn by mouseover
@@ -273,7 +286,22 @@ window.addEventListener('keydown', function(e) {
 
     if (e.key === 'Escape') {
         points = []
+
+        // TODO: From here on down it's the same, isolate the code
+        drawCurrentPolygon()
         drawAllPolygons();
+        var parentPoints = getParentPoints();
+        writePoints(parentPoints);
+    }
+
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        points.pop()
+
+        // TODO: From here on down it's the same, isolate the code
+        drawCurrentPolygon()
+        drawAllPolygons();
+        var parentPoints = getParentPoints();
+        writePoints(parentPoints);
     }
 });
 
@@ -332,6 +360,14 @@ function writePoints(parentPoints) {
         parentPoints = normalized;
     }
 
+    var hasPoints = parentPoints?.some(point => point?.length);
+
+    if (!hasPoints) {
+        document.querySelector('#python').innerHTML = '';
+        document.querySelector('#json').innerHTML;
+        return;
+    }
+
     // create np.array list
     var code_template = `
 [
@@ -344,6 +380,7 @@ ${points.map(function(point) {
 }).join(',')}
 ]
     `;
+
     document.querySelector('#python').innerHTML = code_template;
 
     var json_template = `
@@ -383,28 +420,13 @@ canvas.addEventListener('click', function(e) {
     }
 
     ctx.arc(x, y, 155, 0, 2 * Math.PI);
-    // concat all points into one array
-    var parentPoints = [];
 
-    for (var i = 0; i < masterPoints.length; i++) {
-        parentPoints.push(masterPoints[i]);
-    }
-    // add "points"
-    parentPoints.push(points);
-
+    var parentPoints = getParentPoints();
     writePoints(parentPoints);
 });
 
 document.querySelector('#normalize_checkbox').addEventListener('change', function(e) {
     showNormalized = e.target.checked;
-    // normalize all
-    var parentPoints = [];
-
-    for (var i = 0; i < masterPoints.length; i++) {
-        parentPoints.push(masterPoints[i]);
-    }
-
-    parentPoints.push(points);
-
+    var parentPoints = getParentPoints();
     writePoints(parentPoints);
 });
