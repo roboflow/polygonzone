@@ -242,34 +242,16 @@ canvas.addEventListener('mousemove', function(e) {
 
 window.addEventListener('keydown', function(e) {
     e.stopImmediatePropagation()
+    let validKey = false
+
     if (e.key === 'Enter') {
+        validKey = true
         canvas.style.cursor = 'default';
-        // remove line drawn by mouseover
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // join the dots
-        drawLine(points[0][0], points[0][1], points[points.length - 1][0], points[points.length - 1][1]);
-        // fill polygon with color
-        if (drawMode == 'polygon') {
-            ctx.beginPath();
-            ctx.moveTo(points[0][0], points[0][1]);
-            ctx.fillStyle = opaque_color;
-            for (var i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i][0], points[i][1]);
-            }
-            ctx.closePath();
-            ctx.fill();
-            // draw line connecting last two points
-        }
+
+        // save current polygon points
         masterPoints.push(points);
-        // draw arc around last point
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[points.length - 1][0], points[points.length - 1][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
         points = [];
+
         // dont choose a color that has already been chosen
         var remaining_choices = color_choices.filter(function(x) {
             return !masterColors.includes(x);
@@ -280,24 +262,20 @@ window.addEventListener('keydown', function(e) {
         }
 
         rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
-    
         masterColors.push(rgb_color);
     }
 
     if (e.key === 'Escape') {
+        validKey = true
         points = []
-
-        // TODO: From here on down it's the same, isolate the code
-        drawCurrentPolygon()
-        drawAllPolygons();
-        var parentPoints = getParentPoints();
-        writePoints(parentPoints);
     }
 
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        validKey = true
         points.pop()
+    }
 
-        // TODO: From here on down it's the same, isolate the code
+    if (validKey) {
         drawCurrentPolygon()
         drawAllPolygons();
         var parentPoints = getParentPoints();
