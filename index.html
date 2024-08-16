@@ -21,6 +21,9 @@
         <meta property="twitter:title" content="PolygonZone by Roboflow">
         <meta property="twitter:description" content="Draw polygons on an image and retrieve the coordinates for use in your computer vision projects.">
         <meta property="twitter:image" content="https://camo.githubusercontent.com/ee21eb5f43b191dbfd154dfbc26f9ce731f43dc66749ca6cde23557f48136a1a/68747470733a2f2f6d656469612e726f626f666c6f772e636f6d2f6f70656e2d736f757263652f7375706572766973696f6e2f726f626f666c6f772d7375706572766973696f6e2d62616e6e65722e706e673f696b2d73646b2d76657273696f6e3d6a6176617363726970742d312e342e33267570646174656441743d31363734303632383931303838">
+
+        <!-- Fontawesome -->
+        <script src="https://kit.fontawesome.com/1e5ca35699.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <main>
@@ -29,6 +32,36 @@
                 <div class="left">
                     <h1>Draw points to create polygon coordinates</h1>
                     <p class="show_normalized" id="coords" style="display: none;">x: <span id="x"></span> | y: <span id="y"></span></p>
+                    <div class="taskbar-container">
+                        <div class="taskbar">
+                            <div class="t-icon active">
+                                <i class="fa-solid fa-draw-polygon"></i>
+                                <span class="ti-caption">Polygon Mode</span>
+                            </div>
+                            <div class="t-icon">
+                                <i class="fa-solid fa-arrows-left-right"></i>
+                                <span class="ti-caption">Line Mode</span>
+                            </div>
+                            <div class="t-divider"></div>
+                            <div class="t-icon">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                <span class="ti-caption">Undo</span>
+                            </div>                        
+                            <div class="t-icon">
+                                <i class="fa-solid fa-xmark"></i>
+                                <span class="ti-caption">Cancel current</span>
+                            </div>
+                            <div class="t-divider"></div>
+                            <div class="t-icon">
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span class="ti-caption">Clear polygons</span>
+                            </div>
+                            <div class="t-icon">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span class="ti-caption">Save image</span>
+                            </div>
+                        </div>
+                    </div>
                     <canvas id="canvas"></canvas>
                     <div style="margin-top: 20px;">
                         <a href="" id="clear" class="widgetButton">Clear Polygons</a>

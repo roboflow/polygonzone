@@ -3,7 +3,7 @@ canvas {
     margin: 0 auto;
 }
 * {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
 pre {
     max-height: 200px;
@@ -171,6 +171,56 @@ footer {
 li {
     margin-bottom: 4px;
 }
+
+/* Taskbar */
+.taskbar-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+    margin-top: 32px;
+}
+
+.taskbar {
+    display: flex;
+    background-color: #7733f4;
+    color: #f1edf8;
+
+    border-radius: 5px;
+    width: 700px;
+    padding: 6px;
+
+    justify-content:space-around;
+    box-shadow: 0 2px 3px 1px rgb(0 0 0 / 20%);
+}
+
+.taskbar .t-icon {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 24px;
+    border-radius: 5px;
+    transition: all .15s ease-in-out;
+}
+
+.taskbar .t-icon:hover {
+    cursor: pointer;
+    background-color: #8f54fd;
+}
+
+.taskbar .t-icon.active {
+    background-color: #f4efff;
+    color: #7733f4;
+}
+
+.taskbar .t-icon .ti-caption {
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+.taskbar .t-divider {
+    background-color: #8145f1;
+    width: 1px;
+}
+
 
 /* Helpers */
 .ta-left {
