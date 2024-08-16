@@ -301,19 +301,23 @@ return `{"x": ${point[0]}, "y": ${point[1]}}`;
 }
 
 canvas.addEventListener('click', function(e) {
+    console.log(points)
     // set cursor to crosshair
     canvas.style.cursor = 'crosshair';
-    // if line mode and two points have been drawn, add to masterPoints
-    if (drawMode == 'line' && points.length == 2) {
-        masterPoints.push(points);
-        points = [];
-    }
+
     var x = getScaledCoords(e)[0];
     var y = getScaledCoords(e)[1];
     x = Math.round(x);
     y = Math.round(y);
 
     points.push([x, y]);
+
+    // if line mode and two points have been drawn, add to masterPoints
+    if (drawMode == 'line' && points.length == 2) {
+        masterPoints.push(points);
+        points = [];
+    }
+
     ctx.beginPath();
     ctx.strokeStyle = rgb_color;
     // add rgb_color to masterColors
