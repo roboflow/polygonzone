@@ -301,7 +301,6 @@ return `{"x": ${point[0]}, "y": ${point[1]}}`;
 }
 
 canvas.addEventListener('click', function(e) {
-    console.log(points)
     // set cursor to crosshair
     canvas.style.cursor = 'crosshair';
 
@@ -309,6 +308,18 @@ canvas.addEventListener('click', function(e) {
     var y = getScaledCoords(e)[1];
     x = Math.round(x);
     y = Math.round(y);
+
+    // If starting point os clicked, we complete the polygon 
+    if (drawMode === 'polygon' && points.length > 1) {
+        const [firstPointX, firstPointY] = points[0]
+        const overlapDistance = 15
+        const isXOverlaped = Math.abs(x - firstPointX) <= overlapDistance
+        const isYOverlaped = Math.abs(y - firstPointY) <= overlapDistance
+        if (isXOverlaped && isYOverlaped) {
+            completeCurrentPolygon()
+            return
+        }
+    }
 
     points.push([x, y]);
 
