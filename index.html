@@ -36,34 +36,50 @@
                         <div class="taskbar">
                             <div class="t-icon active">
                                 <i class="fa-solid fa-draw-polygon"></i>
-                                <span class="ti-caption">Polygon Mode</span>
+                                <span class="ti-caption">
+                                    <span>Polygon Mode</span>
+                                    <span>(P)</span>
+                                </span>
                             </div>
                             <div class="t-icon">
                                 <i class="fa-solid fa-arrows-left-right"></i>
-                                <span class="ti-caption">Line Mode</span>
+                                <span class="ti-caption">
+                                    <span>Line Mode</span>
+                                    <span>(L)</span>
+                                </span>
                             </div>
                             <div class="t-divider"></div>
                             <div class="t-icon">
                                 <i class="fa-solid fa-rotate-left"></i>
-                                <span class="ti-caption">Undo</span>
+                                <span class="ti-caption">
+                                    <span>Undo</span>
+                                    <span>(Ctrl/⌘-Z)</span>
+                                </span>
                             </div>                        
                             <div class="t-icon">
                                 <i class="fa-solid fa-xmark"></i>
-                                <span class="ti-caption">Cancel current</span>
+                                <span class="ti-caption">
+                                    <span>Discard current</span>
+                                    <span>(Esc)</span>
+                                </span>
                             </div>
                             <div class="t-divider"></div>
                             <div class="t-icon">
                                 <i class="fa-solid fa-trash-can"></i>
-                                <span class="ti-caption">Clear polygons</span>
+                                <span class="ti-caption">
+                                    <span>Clear all<br>polygons</span>
+                                </span>
                             </div>
                             <div class="t-icon">
                                 <i class="fa-solid fa-floppy-disk"></i>
-                                <span class="ti-caption">Save image</span>
+                                <span class="ti-caption">
+                                    <span>Save image</span>
+                                </span>
                             </div>
                         </div>
                     </div>
                     <canvas id="canvas"></canvas>
-                    <div style="margin-top: 20px;">
+                    <div style="margin-top: 20px; display:none">
                         <a href="" id="clear" class="widgetButton">Clear Polygons</a>
                         <a href="" id="saveImage" class="widgetButton">Save Image</a>
                         <br>
@@ -81,16 +97,6 @@
                             <li>Repeat steps 2 - 4 as many times as you want</li>
                             <li>To finish, copy the numpy points to your clipboard</li>
                         </ol>
-                    </div>
-                    <div class="shortcuts">
-                        <h2>Keyboard shortcuts</h2>
-                        <ul class="ta-left">
-                            <li><kbd>L</kbd>: Switch to line drawing mode</li>
-                            <li><kbd>P</kbd>: Swicth to polygon drawing mode</li>
-                            <li><kbd>Enter</kbd>: If you drawing a polygon, end the polygon</li>
-                            <li><kbd>Esc</kbd>: When drawing, clear the current polygon</li>
-                            <li><kbd>Ctrl(Cmd)-Z</kbd>: Undo the last point</li>
-                        </ul>
                     </div>
                     <h2>NumPy Points</h2>
                     <p>Copy the points below into your Python code.</p>

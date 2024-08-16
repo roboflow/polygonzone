@@ -176,7 +176,7 @@ li {
 .taskbar-container {
     display: flex;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     margin-top: 32px;
 }
 
@@ -214,6 +214,10 @@ li {
 .taskbar .t-icon .ti-caption {
     font-size: 11px;
     margin-top: 8px;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .taskbar .t-divider {
@@ -237,4 +241,16 @@ li {
 
 .mb-3 {
     margin-bottom: 24px;
+}
+
+.mt-1 {
+    margin-top: 8px;
+}
+
+.mt-2 {
+    margin-top: 16px;
+}
+
+.mt-3 {
+    margin-top: 24px;
 }
