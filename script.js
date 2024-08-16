@@ -182,6 +182,7 @@ canvas.addEventListener('dragover', function(e) {
 });
 
 canvas.addEventListener('wheel', function(e) {
+    e.preventDefault()
     var delta = Math.sign(e.deltaY);
     zoom(delta);
 });
@@ -205,8 +206,6 @@ canvas.addEventListener('mousemove', function(e) {
         drawAllPolygons();
     }
 });
-
-
 
 canvas.addEventListener('drop', function(e) {
     e.preventDefault();
