@@ -270,6 +270,11 @@ window.addEventListener('keydown', function(e) {
     
         masterColors.push(rgb_color);
     }
+
+    if (e.key === 'Escape') {
+        points = []
+        drawAllPolygons();
+    }
 });
 
 canvas.addEventListener('drop', function(e) {
