@@ -12,7 +12,9 @@ pre {
     background-color:rgba(17,24,39,0.1);
     padding: 10px;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-y: scroll;
+    text-wrap: wrap;
+    text-align: left;
 }
 body {
     background: rgba(17,24,39,0.4);
@@ -50,34 +52,21 @@ main {
     display: flex;
 }
 .left {
-    flex: 0 60%;
+    flex: 60%;
     padding: 0 2em;
     border-right: 1px solid #e5e7eb;
+    box-sizing: border-box;
 }
 .right {
-    flex: 0 40%;
+    flex: 40%;
     padding: 0 2em;
+    box-sizing: border-box;
 }
-pre {
-    text-align: left;
-}
-.side_by_side {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-}
-.side_by_side:first-child {
-    flex: 0 50%;
-}
-.side_by_side:last-child {
-    flex: 0 40%;
-    width: 100% !important;
-}
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1530px) {
     main {
         padding: 3em;
     }
-    .side_by_side, .flex {
+    .flex {
         display: block;
     }
     .left, .right {
@@ -85,6 +74,10 @@ pre {
     }
     .left {
         border-right: 0;
+    }
+
+    canvas {
+        margin-bottom: 50px;
     }
 }
 .controls {
@@ -168,9 +161,20 @@ li {
     margin-bottom: 4px;
 }
 
+.show-normalized {
+    background-color: #5400ec;
+    opacity: 0.8;
+    color: white;
+    font-weight: 600;
+    display: inline-block;
+    padding: 15px;
+    border-radius: 10px;
+}
+
 /* Taskbar */
 .taskbar-container {
     display: flex;
+    width: 100%;
     align-items: center;
     flex-direction: column;
     margin-bottom: 24px;
@@ -178,7 +182,7 @@ li {
 }
 
 .taskbar-container .tc-container {
-    width: 700px;
+    max-width: 700px;
 }
 
 .taskbar {
