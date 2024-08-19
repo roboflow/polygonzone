@@ -38,6 +38,27 @@
                     </div>
                 </div>
                 <div class="right">
+                    <div class="how-to">
+                        <h2>How to use</h2>
+                        <ol class="ta-left">
+                            <li>Drop an image to the indicated area</li>
+                            <li>Select the desired mode: Press <kbd>L</kbd> to draw a line, or <kbd>P</kbd> to draw a polygon</li>
+                            <li>Start creating your polygon, clicking in the desired points of the image</li>
+                            <li>If in polygon mode, press <kbd>ENTER</kbd> to finish the polygon</li>
+                            <li>Repeat steps 2 - 4 as many times as you want</li>
+                            <li>To finish, copy the numpy points to your clipboard</li>
+                        </ol>
+                    </div>
+                    <div class="shortcuts">
+                        <h2>Keyboard shortcuts</h2>
+                        <ul class="ta-left">
+                            <li><kbd>L</kbd>: Switch to line drawing mode</li>
+                            <li><kbd>P</kbd>: Swicth to polygon drawing mode</li>
+                            <li><kbd>Enter</kbd>: If you drawing a polygon, end the polygon</li>
+                            <li><kbd>Esc</kbd>: When drawing, clear the current polygon</li>
+                            <li><kbd>Ctrl(Cmd)-Z</kbd>: Undo the last point</li>
+                        </ul>
+                    </div>
                     <h2>NumPy Points</h2>
                     <p>Copy the points below into your Python code.</p>
                     <a href="" id="clipboard" class="widgetButton">Copy Python to Clipboard</a>
@@ -45,7 +66,7 @@
                         <code>
                         </code>
                     </pre>
-                    <div class="show_normalized" style="margin-bottom: 25px;">
+                    <div class="show_normalized mb-3">
                         <label for="normalize_checkbox">Show Normalized Points from 0-1</label>
                         <input type="checkbox" id="normalize_checkbox" name="normalize_checkbox" value="normalize_checkbox">
                     </div>
