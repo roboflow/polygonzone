@@ -93,7 +93,7 @@ function drawLine(x1, y1, x2, y2) {
     ctx.lineWidth = 5;
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    ctx.stroke();
+    // ctx.stroke();
 }
 
 function getScaledCoords(e) {
@@ -112,6 +112,17 @@ function drawAllPolygons () {
         for (var j = 1; j < newpoints.length; j++) {
             // draw all lines
             drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+
+            // fill
+            ctx.beginPath();
+            ctx.fillStyle = opaque_color;
+            ctx.moveTo(newpoints[0][0], newpoints[0][1]);
+            for (var j = 1; j < newpoints.length; j++) {
+                ctx.lineTo(newpoints[j][0], newpoints[j][1]);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
         }
         drawLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
         // draw arc around each point
@@ -124,15 +135,7 @@ function drawAllPolygons () {
             ctx.fill();
             ctx.stroke();
         }
-        // fill
-        ctx.beginPath();
-        ctx.fillStyle = opaque_color;
-        ctx.moveTo(newpoints[0][0], newpoints[0][1]);
-        for (var j = 1; j < newpoints.length; j++) {
-            ctx.lineTo(newpoints[j][0], newpoints[j][1]);
-        }
-        ctx.closePath();
-        ctx.fill();
+        
     }
 }
 
@@ -206,20 +209,24 @@ canvas.addEventListener('mousemove', function(e) {
         drawAllPolygons();
 
         for (var i = 0; i < points.length - 1; i++) {
+            ctx.strokeStyle = rgb_color;
             drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            ctx.stroke();
             // draw arc around each point
             ctx.beginPath();
-            ctx.strokeStyle = rgb_color;
             ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
             // fill with white
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.stroke();
         }
+
+
         if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
-            ctx.beginPath();
             ctx.strokeStyle = rgb_color;
+            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
+            ctx.stroke(); // new
+            ctx.beginPath();
             ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
             // fill with white
             ctx.fillStyle = 'white';
