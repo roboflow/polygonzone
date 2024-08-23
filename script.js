@@ -356,6 +356,14 @@ canvas.addEventListener('click', function(e) {
 
     points.push([x, y]);
 
+    ctx.beginPath();
+    ctx.strokeStyle = rgb_color;
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    // fill with white
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.stroke();
+
     if(drawMode == "line" && points.length == 2) {
         closePath();
     }
