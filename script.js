@@ -449,6 +449,7 @@ function clearAll() {
 
     points = []
     masterPoints = []
+    masterColors = []
     document.querySelector('#json').innerHTML = ''
     document.querySelector('#python').innerHTML = ''
 }
