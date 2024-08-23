@@ -12,8 +12,12 @@ var color_choices = [
     "#CCCCCC",
 ];
 
+var radiansPer45Degrees = Math.PI / 4;
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
+ctx.lineJoin = 'bevel';
+
 var img = new Image();
 var rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)] 
 var opaque_color =  'rgba(0,0,0,0.5)';
@@ -28,12 +32,11 @@ var masterColors = [];
 
 var drawMode
 setDrawMode('polygon')
-
+var constrainAngles = false;
 var showNormalized = false;
 
 var modeMessage = document.querySelector('#mode');
 var coords = document.querySelector('#coords');
-
 
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
@@ -53,6 +56,28 @@ function zoom(clicks) {
     canvas.style.height = h + 'px';
 }
 
+function closePath() {
+    canvas.style.cursor = 'default';
+    masterPoints.push(points);
+    masterColors.push(rgb_color);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    drawAllPolygons();
+    points = [];
+
+    // dont choose a color that has already been chosen
+    var remaining_choices = color_choices.filter(function(x) {
+        return !masterColors.includes(x);
+    });
+    
+    if (remaining_choices.length == 0) {
+        remaining_choices = color_choices;
+    }
+
+    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
+}
+
 // placeholder image
 img.src = 'https://assets.website-files.com/5f6bc60e665f54545a1e52a5/63d3f236a6f0dae14cdf0063_drag-image-here.png';
 img.onload = function() {
@@ -70,7 +95,7 @@ function drawLine(x1, y1, x2, y2) {
     ctx.lineWidth = 5;
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    ctx.stroke();
+    // ctx.stroke();
 }
 
 function getScaledCoords(e) {
@@ -78,50 +103,6 @@ function getScaledCoords(e) {
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
     return [x / scaleFactor, y / scaleFactor];
-}
-
-function drawCurrentPolygon (cursorX, cursorY) {
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0);
-    for (var i = 0; i < points.length - 1; i++) {
-        // draw arc around each point
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
-        drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
-    }
-    
-    if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
-
-        if (cursorX && cursorY) {
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], cursorX, cursorY);
-        }
-
-        if (points.length == 2 && drawMode == "line") {
-            console.log("line");
-            // draw arc around each point
-            ctx.beginPath();
-            ctx.strokeStyle = rgb_color;
-            ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
-            masterPoints.push(points);
-            points = [];
-        }
-    }
 }
 
 function drawAllPolygons () {
@@ -133,6 +114,17 @@ function drawAllPolygons () {
         for (var j = 1; j < newpoints.length; j++) {
             // draw all lines
             drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+
+            // fill
+            ctx.beginPath();
+            ctx.fillStyle = opaque_color;
+            ctx.moveTo(newpoints[0][0], newpoints[0][1]);
+            for (var j = 1; j < newpoints.length; j++) {
+                ctx.lineTo(newpoints[j][0], newpoints[j][1]);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
         }
         drawLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
         // draw arc around each point
@@ -145,15 +137,7 @@ function drawAllPolygons () {
             ctx.fill();
             ctx.stroke();
         }
-        // fill
-        ctx.beginPath();
-        ctx.fillStyle = opaque_color;
-        ctx.moveTo(newpoints[0][0], newpoints[0][1]);
-        for (var j = 1; j < newpoints.length; j++) {
-            ctx.lineTo(newpoints[j][0], newpoints[j][1]);
-        }
-        ctx.closePath();
-        ctx.fill();
+        
     }
 }
 
@@ -166,6 +150,11 @@ function getParentPoints () {
     return parentPoints;
 }
 
+window.addEventListener('keyup', function(e) {
+    if (e.key === 'Shift') {
+        constrainAngles = false;
+    }
+});
 
 document.querySelector('#clipboard').addEventListener('click', function(e) {
     e.preventDefault();
@@ -198,12 +187,54 @@ canvas.addEventListener('mousemove', function(e) {
     // update x y coords
     var xcoord = document.querySelector('#x');
     var ycoord = document.querySelector('#y');
+
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
+
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
     if (canvas.style.cursor == 'crosshair') {
-        drawCurrentPolygon(x, y)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        
         drawAllPolygons();
+
+        for (var i = 0; i < points.length - 1; i++) {
+            ctx.strokeStyle = rgb_color;
+            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            ctx.stroke();
+            // draw arc around each point
+            ctx.beginPath();
+            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
+        }
+
+
+        if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+            ctx.strokeStyle = rgb_color;
+            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
+            ctx.stroke(); // new
+            ctx.beginPath();
+            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
+        }
     }
 });
 
@@ -309,37 +340,59 @@ canvas.addEventListener('click', function(e) {
     x = Math.round(x);
     y = Math.round(y);
 
-    // If starting point os clicked, we complete the polygon 
-    if (drawMode === 'polygon' && points.length > 1) {
-        const [firstPointX, firstPointY] = points[0]
-        const overlapDistance = 15
-        const isXOverlaped = Math.abs(x - firstPointX) <= overlapDistance
-        const isYOverlaped = Math.abs(y - firstPointY) <= overlapDistance
-        if (isXOverlaped && isYOverlaped) {
-            completeCurrentPolygon()
-            return
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
+
+    if (points.length > 2 && drawMode == "polygon") {
+        distX = x - points[0][0];
+        distY = y - points[0][1];
+        // stroke is 3px and centered on the circle (i.e. 1/2 * 3px) and arc radius is 
+        if(Math.sqrt(distX * distX + distY * distY) <= 6.5) {
+            closePath();
+            return;
         }
     }
 
     points.push([x, y]);
 
-    // if line mode and two points have been drawn, add to masterPoints
-    if (drawMode == 'line' && points.length == 2) {
-        masterPoints.push(points);
-        points = [];
-    }
-
     ctx.beginPath();
     ctx.strokeStyle = rgb_color;
-    // add rgb_color to masterColors
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    // fill with white
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.stroke();
+
+    if(drawMode == "line" && points.length == 2) {
+        closePath();
+    }
+    else {
+        ctx.beginPath();
+        ctx.strokeStyle = rgb_color;
+    }
     
-    if (masterColors.length == 0) {
-        masterColors.push(rgb_color);
+    // ctx.arc(x, y, 155, 0, 2 * Math.PI);
+    // concat all points into one array
+    var parentPoints = [];
+
+    for (var i = 0; i < masterPoints.length; i++) {
+        parentPoints.push(masterPoints[i]);
+    }
+    // add "points"
+    if(points.length > 0) {
+        parentPoints.push(points);
     }
 
-    ctx.arc(x, y, 155, 0, 2 * Math.PI);
-
-    var parentPoints = getParentPoints();
     writePoints(parentPoints);
 });
 
@@ -374,8 +427,9 @@ document.addEventListener('keydown', function(e) {
 })
 
 function draw () {
-    drawCurrentPolygon()
+    
     drawAllPolygons()
+    drawCurrentPolygon()
     var parentPoints = getParentPoints()
     writePoints(parentPoints)
 }
@@ -415,6 +469,7 @@ function clearAll() {
 
     points = []
     masterPoints = []
+    masterColors = []
     document.querySelector('#json').innerHTML = ''
     document.querySelector('#python').innerHTML = ''
 }
@@ -464,6 +519,10 @@ window.addEventListener('keydown', function(e) {
         e.stopImmediatePropagation()
 
         undo()
+    }
+
+    if (e.key === 'Shift') {
+        constrainAngles = true;
     }
 
     if (e.key === 'Escape') {
