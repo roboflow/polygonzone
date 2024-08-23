@@ -206,6 +206,7 @@ canvas.addEventListener('mousemove', function(e) {
         drawAllPolygons();
 
         for (var i = 0; i < points.length - 1; i++) {
+            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             // draw arc around each point
             ctx.beginPath();
             ctx.strokeStyle = rgb_color;
@@ -214,9 +215,9 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.stroke();
-            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
         }
         if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
             ctx.beginPath();
             ctx.strokeStyle = rgb_color;
             ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
@@ -224,7 +225,6 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.stroke();
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
         }
     }
 });
