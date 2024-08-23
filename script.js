@@ -36,7 +36,6 @@ var showNormalized = false;
 var modeMessage = document.querySelector('#mode');
 var coords = document.querySelector('#coords');
 
-
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
     navigator.clipboard.writeText(copyText);
@@ -53,6 +52,28 @@ function zoom(clicks) {
     var h = img.height * scaleFactor;
     canvas.style.width = w + 'px';
     canvas.style.height = h + 'px';
+}
+
+function closePath() {
+    canvas.style.cursor = 'default';
+    masterPoints.push(points);
+    masterColors.push(rgb_color);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    
+    drawAllPolygons();
+    points = [];
+
+    // dont choose a color that has already been chosen
+    var remaining_choices = color_choices.filter(function(x) {
+        return !masterColors.includes(x);
+    });
+    
+    if (remaining_choices.length == 0) {
+        remaining_choices = color_choices;
+    }
+
+    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
 }
 
 // placeholder image
@@ -343,37 +364,38 @@ canvas.addEventListener('click', function(e) {
         y = Math.round(new_y);
     }
 
-    // If starting point os clicked, we complete the polygon 
-    if (drawMode === 'polygon' && points.length > 1) {
-        const [firstPointX, firstPointY] = points[0]
-        const overlapDistance = 15
-        const isXOverlaped = Math.abs(x - firstPointX) <= overlapDistance
-        const isYOverlaped = Math.abs(y - firstPointY) <= overlapDistance
-        if (isXOverlaped && isYOverlaped) {
-            completeCurrentPolygon()
-            return
+    if (points.length > 2 && drawMode == "polygon") {
+        distX = x - points[0][0];
+        distY = y - points[0][1];
+        // stroke is 3px and centered on the circle (i.e. 1/2 * 3px) and arc radius is 5px
+        if(Math.sqrt(distX * distX + distY * distY) <= 6.5) {
+            closePath();
+            return;
         }
     }
 
     points.push([x, y]);
 
-    // if line mode and two points have been drawn, add to masterPoints
-    if (drawMode == 'line' && points.length == 2) {
-        masterPoints.push(points);
-        points = [];
+    if(drawMode == "line" && points.length == 2) {
+        closePath();
     }
-
-    ctx.beginPath();
-    ctx.strokeStyle = rgb_color;
-    // add rgb_color to masterColors
+    else {
+        ctx.beginPath();
+        ctx.strokeStyle = rgb_color;
+    }
     
-    if (masterColors.length == 0) {
-        masterColors.push(rgb_color);
+    // ctx.arc(x, y, 155, 0, 2 * Math.PI);
+    // concat all points into one array
+    var parentPoints = [];
+
+    for (var i = 0; i < masterPoints.length; i++) {
+        parentPoints.push(masterPoints[i]);
+    }
+    // add "points"
+    if(points.length > 0) {
+        parentPoints.push(points);
     }
 
-    ctx.arc(x, y, 155, 0, 2 * Math.PI);
-
-    var parentPoints = getParentPoints();
     writePoints(parentPoints);
 });
 
