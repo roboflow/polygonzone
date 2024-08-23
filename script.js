@@ -103,50 +103,6 @@ function getScaledCoords(e) {
     return [x / scaleFactor, y / scaleFactor];
 }
 
-function drawCurrentPolygon (cursorX, cursorY) {
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0);
-    for (var i = 0; i < points.length - 1; i++) {
-        // draw arc around each point
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
-        drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
-    }
-    
-    if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
-        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
-
-        if (cursorX && cursorY) {
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], cursorX, cursorY);
-        }
-
-        if (points.length == 2 && drawMode == "line") {
-            console.log("line");
-            // draw arc around each point
-            ctx.beginPath();
-            ctx.strokeStyle = rgb_color;
-            ctx.arc(points[0][0], points[0][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
-            masterPoints.push(points);
-            points = [];
-        }
-    }
-}
-
 function drawAllPolygons () {
     // draw all points for previous regions
     for (var i = 0; i < masterPoints.length; i++) {
@@ -244,8 +200,32 @@ canvas.addEventListener('mousemove', function(e) {
     ycoord.innerHTML = y;
 
     if (canvas.style.cursor == 'crosshair') {
-        drawCurrentPolygon(x, y)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        
         drawAllPolygons();
+
+        for (var i = 0; i < points.length - 1; i++) {
+            // draw arc around each point
+            ctx.beginPath();
+            ctx.strokeStyle = rgb_color;
+            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
+            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+        }
+        if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+            ctx.beginPath();
+            ctx.strokeStyle = rgb_color;
+            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
+            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
+        }
     }
 });
 
@@ -367,7 +347,7 @@ canvas.addEventListener('click', function(e) {
     if (points.length > 2 && drawMode == "polygon") {
         distX = x - points[0][0];
         distY = y - points[0][1];
-        // stroke is 3px and centered on the circle (i.e. 1/2 * 3px) and arc radius is 5px
+        // stroke is 3px and centered on the circle (i.e. 1/2 * 3px) and arc radius is 
         if(Math.sqrt(distX * distX + distY * distY) <= 6.5) {
             closePath();
             return;
@@ -430,8 +410,9 @@ document.addEventListener('keydown', function(e) {
 })
 
 function draw () {
-    drawCurrentPolygon()
+    
     drawAllPolygons()
+    drawCurrentPolygon()
     var parentPoints = getParentPoints()
     writePoints(parentPoints)
 }
