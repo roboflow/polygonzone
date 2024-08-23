@@ -16,6 +16,8 @@ var radiansPer45Degrees = Math.PI / 4;
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
+ctx.lineJoin = 'bevel';
+
 var img = new Image();
 var rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)] 
 var opaque_color =  'rgba(0,0,0,0.5)';
