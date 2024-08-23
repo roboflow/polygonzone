@@ -12,6 +12,8 @@ var color_choices = [
     "#CCCCCC",
 ];
 
+var radiansPer45Degrees = Math.PI / 4;
+
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 var img = new Image();
@@ -28,7 +30,7 @@ var masterColors = [];
 
 var drawMode
 setDrawMode('polygon')
-
+var constrainAngles = false;
 var showNormalized = false;
 
 var modeMessage = document.querySelector('#mode');
@@ -166,6 +168,11 @@ function getParentPoints () {
     return parentPoints;
 }
 
+window.addEventListener('keyup', function(e) {
+    if (e.key === 'Shift') {
+        constrainAngles = false;
+    }
+});
 
 document.querySelector('#clipboard').addEventListener('click', function(e) {
     e.preventDefault();
@@ -198,6 +205,20 @@ canvas.addEventListener('mousemove', function(e) {
     // update x y coords
     var xcoord = document.querySelector('#x');
     var ycoord = document.querySelector('#y');
+
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
+
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
@@ -308,6 +329,19 @@ canvas.addEventListener('click', function(e) {
     var y = getScaledCoords(e)[1];
     x = Math.round(x);
     y = Math.round(y);
+
+    if(constrainAngles) {
+        var lastPoint = points[points.length - 1];
+        var dx = x - lastPoint[0];
+        var dy = y - lastPoint[1];
+        var angle = Math.atan2(dy, dx);
+        var length = Math.sqrt(dx * dx + dy * dy);
+        const snappedAngle = Math.round(angle / radiansPer45Degrees) * radiansPer45Degrees;
+        var new_x = lastPoint[0] + length * Math.cos(snappedAngle);
+        var new_y = lastPoint[1] + length * Math.sin(snappedAngle);
+        x = Math.round(new_x);
+        y = Math.round(new_y);
+    }
 
     // If starting point os clicked, we complete the polygon 
     if (drawMode === 'polygon' && points.length > 1) {
@@ -464,6 +498,10 @@ window.addEventListener('keydown', function(e) {
         e.stopImmediatePropagation()
 
         undo()
+    }
+
+    if (e.key === 'Shift') {
+        constrainAngles = true;
     }
 
     if (e.key === 'Escape') {
