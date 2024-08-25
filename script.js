@@ -35,7 +35,7 @@ var constrainAngles = false;
 var showNormalized = false;
 
 var modeMessage = document.querySelector('#mode');
-var coords = document.querySelector('#coords');
+// var coords = document.querySelector('#coords');
 
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
@@ -313,7 +313,7 @@ canvas.addEventListener('drop', function(e) {
         ctx.drawImage(img, 0, 0);
     };
     // show coords
-    document.getElementById('coords').style.display = 'inline-block';
+    // document.getElementById('coords').style.display = 'inline-block';
 });
 
 function writePoints(parentPoints) {
