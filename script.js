@@ -425,7 +425,6 @@ document.addEventListener('keydown', function(e) {
 })
 
 function draw () {
-    
     drawAllPolygons()
     drawCurrentPolygon()
     var parentPoints = getParentPoints()
@@ -489,28 +488,6 @@ document.querySelector('#save-image').addEventListener('click', function(e) {
     saveImage()
 })
 
-function completeCurrentPolygon () {
-    canvas.style.cursor = 'default'
-
-    // save current polygon points
-    masterPoints.push(points)
-    points = []
-
-    // dont choose a color that has already been chosen
-    var remaining_choices = color_choices.filter(function(x) {
-        return !masterColors.includes(x)
-    });
-    
-    if (remaining_choices.length == 0) {
-        remaining_choices = color_choices
-    }
-
-    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)]
-    masterColors.push(rgb_color)
-
-    draw()
-}
-
 window.addEventListener('keydown', function(e) {
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault()
@@ -539,6 +516,8 @@ window.addEventListener('keydown', function(e) {
     }
 
     if (e.key === 'Enter') {
-        completeCurrentPolygon()
+        if(points.length > 2) {
+            closePath()
+        }
     }
 })
