@@ -177,6 +177,13 @@ canvas.addEventListener('wheel', function(e) {
     zoom(delta);
 });
 
+canvas.addEventListener('mouseleave', function(e) {
+    var xcoord = document.querySelector('#x');
+    var ycoord = document.querySelector('#y'); 
+    xcoord.innerHTML = '';
+    ycoord.innerHTML = '';
+});
+
 // on canvas hover, if cursor is crosshair, draw line from last point to cursor
 canvas.addEventListener('mousemove', function(e) {
     var x = getScaledCoords(e)[0];
@@ -202,6 +209,13 @@ canvas.addEventListener('mousemove', function(e) {
         y = Math.round(new_y);
     }
 
+    // sometimes, a mousemove event is leaving the canvas and has coordinates outside the canvas
+    // however, due to the cursors being used, we do not need to check if it is larger than canvas.width or canvas.height
+    if (x < 0 || y < 0 ){
+        xcoord.innerHTML = '';
+        ycoord.innerHTML = '';
+        return;
+    }
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
@@ -441,10 +455,15 @@ function undo () {
     highlightButtonInteraction('#undo')
 
     if (points.length > 0) {
+
         points.pop()
         
         clearDrawings()
         draw()
+
+        if(points.length === 0){
+            return;
+        }
         ctx.strokeStyle = rgb_color;
         var i = 0;
         for (; i < points.length - 1; i++) {
@@ -459,13 +478,13 @@ function undo () {
             ctx.stroke();
         }
 
-        // draw arc around point n
-        ctx.beginPath();
-        ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-        // fill with white
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.stroke();
+            // draw arc around point n
+            ctx.beginPath();
+            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
+            // fill with white
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            ctx.stroke();
     }
 }
 
