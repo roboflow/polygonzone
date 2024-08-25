@@ -18,7 +18,7 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 var img = new Image();
 var rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)] 
-var opaque_color =  'rgba(0,0,0,0.5)';
+var fill_color =  'rgba(0,0,0,0.35)';
 
 var scaleFactor = 1;
 var scaleSpeed = 0.01;
@@ -46,6 +46,16 @@ function clearDrawings() {
     ctx.drawImage(img, 0, 0);
 }
 
+function isClockwise(vertices) {
+    let sum = 0;
+    for (let i = 0; i < vertices.length; i++) {
+        const [x1, y1] = vertices[i];
+        const [x2, y2] = vertices[(i + 1) % vertices.length];
+        sum += (x2 - x1) * (y2 + y1);
+    }
+    return sum > 0;
+}
+
 function zoom(clicks) {
     // if w > 60em, stop
     if ((scaleFactor + clicks * scaleSpeed) * img.width > 40 * 16) {
@@ -61,11 +71,15 @@ function zoom(clicks) {
 
 function closePath() {
     canvas.style.cursor = 'default';
+    // we do this to avoid clearing overlapping polygons
+    if (isClockwise(points)) {
+        points = points.reverse();
+    }
     masterPoints.push(points);
+    points = [];
     masterColors.push(rgb_color);
     clearDrawings();
     drawAllPolygons();
-    points = [];
 
     // dont choose a color that has already been chosen
     var remaining_choices = color_choices.filter(function(x) {
@@ -91,12 +105,8 @@ img.onload = function() {
 };
 
 function drawLine(x1, y1, x2, y2) {
-    ctx.beginPath();
-    // set widht
-    ctx.lineWidth = 5;
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    // ctx.stroke();
 }
 
 function getScaledCoords(e) {
@@ -107,38 +117,48 @@ function getScaledCoords(e) {
 }
 
 function drawAllPolygons () {
-    // draw all points for previous regions
+    // draw polygons as subpaths and fill all at once
+    // we do this to avoid overlapping polygons becoming opaque
+    ctx.beginPath();
+    ctx.fillStyle = fill_color;
     for (var i = 0; i < masterPoints.length; i++) {
         var newpoints = masterPoints[i];
-        // set color
-        ctx.strokeStyle = masterColors[i];
         for (var j = 1; j < newpoints.length; j++) {
-            // draw all lines
             drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
-
-            // fill
-            ctx.beginPath();
-            ctx.fillStyle = opaque_color;
             ctx.moveTo(newpoints[0][0], newpoints[0][1]);
             for (var j = 1; j < newpoints.length; j++) {
                 ctx.lineTo(newpoints[j][0], newpoints[j][1]);
             }
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+            drawLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
         }
-        drawLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
+    }
+    ctx.fill();
+    
+    ctx.lineWidth = 5;
+    for (var i = 0; i < masterPoints.length; i++) {
+        var newpoints = masterPoints[i];
+        ctx.strokeStyle = masterColors[i];
+
+        ctx.beginPath();
+        for (var j = 1; j < newpoints.length; j++) {
+            drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+            ctx.moveTo(newpoints[0][0], newpoints[0][1]);
+            for (var j = 1; j < newpoints.length; j++) {
+                ctx.lineTo(newpoints[j][0], newpoints[j][1]);
+            }   
+        }
+        ctx.closePath();
+        ctx.stroke();
+
         // draw arc around each point
         for (var j = 0; j < newpoints.length; j++) {
             ctx.beginPath();
-            ctx.strokeStyle = masterColors[i];
             ctx.arc(newpoints[j][0], newpoints[j][1], 5, 0, 2 * Math.PI);
-            // fill with white
+            ctx.closePath();
             ctx.fillStyle = 'white';
             ctx.fill();
             ctx.stroke();
         }
-        
     }
 }
 
@@ -221,31 +241,36 @@ canvas.addEventListener('mousemove', function(e) {
 
     if (canvas.style.cursor == 'crosshair') {
         clearDrawings();
-        
         drawAllPolygons();
 
         for (var i = 0; i < points.length - 1; i++) {
             ctx.strokeStyle = rgb_color;
+            ctx.beginPath();
             drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            ctx.closePath();
             ctx.stroke();
             // draw arc around each point
             ctx.beginPath();
             ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
             // fill with white
             ctx.fillStyle = 'white';
+            ctx.closePath();
             ctx.fill();
             ctx.stroke();
         }
 
 
         if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
+            ctx.beginPath();
             ctx.strokeStyle = rgb_color;
             drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
-            ctx.stroke(); // new
+            ctx.closePath();
+
+            ctx.stroke();
             ctx.beginPath();
             ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
             ctx.fillStyle = 'white';
+            ctx.closePath();
             ctx.fill();
             ctx.stroke();
         }
@@ -382,17 +407,13 @@ canvas.addEventListener('click', function(e) {
     ctx.beginPath();
     ctx.strokeStyle = rgb_color;
     ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    // fill with white
+    ctx.closePath();
     ctx.fillStyle = 'white';
     ctx.fill();
     ctx.stroke();
 
     if(drawMode == "line" && points.length == 2) {
         closePath();
-    }
-    else {
-        ctx.beginPath();
-        ctx.strokeStyle = rgb_color;
     }
     
     // ctx.arc(x, y, 155, 0, 2 * Math.PI);
