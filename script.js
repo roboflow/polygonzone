@@ -16,7 +16,6 @@ var radiansPer45Degrees = Math.PI / 4;
 
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
-ctx.lineJoin = 'bevel';
 
 var img = new Image();
 var rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)] 
@@ -137,6 +136,7 @@ function drawAllPolygons () {
     ctx.fill();
     
     ctx.lineWidth = 5;
+    ctx.lineJoin = 'bevel';
     for (var i = 0; i < masterPoints.length; i++) {
         var newpoints = masterPoints[i];
         ctx.strokeStyle = masterColors[i];
@@ -248,6 +248,7 @@ canvas.addEventListener('mousemove', function(e) {
         for (var i = 0; i < points.length - 1; i++) {
             ctx.strokeStyle = rgb_color;
             ctx.beginPath();
+            ctx.lineJoin = 'bevel';
             drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             ctx.closePath();
             ctx.stroke();
@@ -264,6 +265,7 @@ canvas.addEventListener('mousemove', function(e) {
 
         if ((points.length > 0 && drawMode == "polygon") || (points.length > 0 && points.length < 2 && drawMode == "line")) {
             ctx.beginPath();
+            ctx.lineJoin = 'bevel';
             ctx.strokeStyle = rgb_color;
             drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
             ctx.closePath();
