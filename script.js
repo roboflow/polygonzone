@@ -457,10 +457,10 @@ document.querySelector('#mode-line').addEventListener('click', function(e) {
 })
 
 document.addEventListener('keydown', function(e) {
-    if (e.key == 'l') {
+    if (e.key == 'l' || e.key == 'L') {
         setDrawMode('line')
     }
-    if (e.key == 'p') {
+    if (e.key == 'p' || e.key == 'P') {
         setDrawMode('polygon')
     }
 })
