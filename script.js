@@ -11,6 +11,7 @@ var color_choices = [
     "#0000FF",
     "#CCCCCC",
 ];
+// if you want choices to be kind of random, shuffle the array once here
 
 var radiansPer45Degrees = Math.PI / 4;
 
@@ -18,7 +19,7 @@ var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
 var img = new Image();
-var rgb_color = color_choices[Math.floor(Math.random() * color_choices.length)] 
+var rgb_color = "#FF00FF"; 
 var fill_color =  'rgba(0,0,0,0.35)';
 
 var scaleFactor = 1;
@@ -81,17 +82,8 @@ function onPathClose() {
     masterColors.push(rgb_color);
     clearDrawings();
     drawAllPolygons();
-
-    // dont choose a color that has already been chosen
-    var remaining_choices = color_choices.filter(function(x) {
-        return !masterColors.includes(x);
-    });
     
-    if (remaining_choices.length == 0) {
-        remaining_choices = color_choices;
-    }
-
-    rgb_color = remaining_choices[Math.floor(Math.random() * remaining_choices.length)];
+    rgb_color = color_choices[(masterColors.length) % (color_choices.length)];
 }
 
 // placeholder image
