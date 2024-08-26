@@ -29,8 +29,8 @@ var regions = [];
 var masterPoints = [];
 var masterColors = [];
 
-var drawMode
-setDrawMode('polygon')
+var drawMode;
+setDrawMode('polygon');
 var constrainAngles = false;
 var showNormalized = false;
 
@@ -70,7 +70,7 @@ function zoom(clicks) {
     canvas.style.height = h + 'px';
 }
 
-function closePath() {
+function onPathClose() {
     canvas.style.cursor = 'default';
     // we do this to avoid clearing overlapping polygons
     if (isClockwise(points)) {
@@ -105,9 +105,21 @@ img.onload = function() {
     ctx.drawImage(img, 0, 0);
 };
 
-function drawLine(x1, y1, x2, y2) {
+function makeLine(x1, y1, x2, y2) {
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
+}
+
+function drawNode(x, y, stroke = null) {
+    if (stroke) {
+        ctx.strokeStyle = stroke;
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.stroke();
 }
 
 function getScaledCoords(e) {
@@ -125,12 +137,12 @@ function drawAllPolygons () {
     for (var i = 0; i < masterPoints.length; i++) {
         var newpoints = masterPoints[i];
         for (var j = 1; j < newpoints.length; j++) {
-            drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+            makeLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
             ctx.moveTo(newpoints[0][0], newpoints[0][1]);
             for (var j = 1; j < newpoints.length; j++) {
                 ctx.lineTo(newpoints[j][0], newpoints[j][1]);
             }
-            drawLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
+            makeLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
         }
     }
     ctx.fill();
@@ -143,7 +155,7 @@ function drawAllPolygons () {
 
         ctx.beginPath();
         for (var j = 1; j < newpoints.length; j++) {
-            drawLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+            makeLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
             ctx.moveTo(newpoints[0][0], newpoints[0][1]);
             for (var j = 1; j < newpoints.length; j++) {
                 ctx.lineTo(newpoints[j][0], newpoints[j][1]);
@@ -154,12 +166,7 @@ function drawAllPolygons () {
 
         // draw arc around each point
         for (var j = 0; j < newpoints.length; j++) {
-            ctx.beginPath();
-            ctx.arc(newpoints[j][0], newpoints[j][1], 5, 0, 2 * Math.PI);
-            ctx.closePath();
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
+            drawNode(newpoints[j][0], newpoints[j][1]);
         }
     }
 }
@@ -249,17 +256,11 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.strokeStyle = rgb_color;
             ctx.beginPath();
             ctx.lineJoin = 'bevel';
-            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            makeLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             ctx.closePath();
             ctx.stroke();
-            // draw arc around each point
-            ctx.beginPath();
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+
+            drawNode(points[i][0], points[i][1]);
         }
 
 
@@ -267,16 +268,11 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.beginPath();
             ctx.lineJoin = 'bevel';
             ctx.strokeStyle = rgb_color;
-            drawLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
+            makeLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
             ctx.closePath();
+            ctx.stroke();
 
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'white';
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
+            drawNode(points[i][0], points[i][1]);
         }
     }
 });
@@ -346,36 +342,22 @@ function writePoints(parentPoints) {
     }
 
     // create np.array list
-    var code_template = `
-[
-${parentPoints.map(function(points) {
-return `np.array([
-${points.map(function(point) {
-    return `[${point[0]}, ${point[1]}]`;
-}).join(',')}
-])`;
-}).join(',')}
-]
-    `;
+    var code_template = `[\n${parentPoints.map(function(points) {
+                            return `    np.array([${points.map(function(point) {
+                                return `[${point[0]}, ${point[1]}]`;}).join(', ')}])`;
+                            }).join(',\n')}\n]`;
 
     document.querySelector('#python').innerHTML = code_template;
 
-    var json_template = `
-{
-${parentPoints.map(function(points) {
-return `[
-${points.map(function(point) {
-return `{"x": ${point[0]}, "y": ${point[1]}}`;
-}).join(',')}
-]`;
-}).join(',')}
-}
-    `;
+    var json_template = `{\n${parentPoints.map(function(points) {
+        return `    [${points.map(function(point) {
+            return `{"x": ${point[0]}, "y": ${point[1]}}`;}).join(', ')}]`;
+        }).join(',\n')}\n}`;
+
     document.querySelector('#json').innerHTML = json_template;
 }
 
 canvas.addEventListener('click', function(e) {
-    // set cursor to crosshair
     canvas.style.cursor = 'crosshair';
 
     var x = getScaledCoords(e)[0];
@@ -401,26 +383,19 @@ canvas.addEventListener('click', function(e) {
         distY = y - points[0][1];
         // stroke is 3px and centered on the circle (i.e. 1/2 * 3px) and arc radius is 
         if(Math.sqrt(distX * distX + distY * distY) <= 6.5) {
-            closePath();
+            onPathClose();
             return;
         }
     }
 
     points.push([x, y]);
 
-    ctx.beginPath();
-    ctx.strokeStyle = rgb_color;
-    ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    ctx.closePath();
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    ctx.stroke();
+    drawNode(x, y, rgb_color); 
 
     if(drawMode == "line" && points.length == 2) {
-        closePath();
+        onPathClose();
     }
-    
-    // ctx.arc(x, y, 155, 0, 2 * Math.PI);
+
     // concat all points into one array
     var parentPoints = [];
 
@@ -442,125 +417,110 @@ document.querySelector('#normalize-checkbox').addEventListener('change', functio
 });
 
 function setDrawMode(mode) {
-    drawMode = mode
+    drawMode = mode;
     canvas.style.cursor = 'crosshair';
-    document.querySelectorAll('.t-mode').forEach(el => el.classList.remove('active'))
-    document.querySelector(`#mode-${mode}`).classList.add('active')
+    document.querySelectorAll('.t-mode').forEach(el => el.classList.remove('active'));
+    document.querySelector(`#mode-${mode}`).classList.add('active');
 }
 
 document.querySelector('#mode-polygon').addEventListener('click', function(e) {
-    setDrawMode('polygon')
+    setDrawMode('polygon');
 })
 
 document.querySelector('#mode-line').addEventListener('click', function(e) {
-    setDrawMode('line')
+    setDrawMode('line');
 })
 
 document.addEventListener('keydown', function(e) {
     if (e.key == 'l' || e.key == 'L') {
-        setDrawMode('line')
+        setDrawMode('line');
     }
     if (e.key == 'p' || e.key == 'P') {
-        setDrawMode('polygon')
+        setDrawMode('polygon');
     }
 })
 
-function draw () {
-    drawAllPolygons()
-    var parentPoints = getParentPoints()
-    writePoints(parentPoints)
+function update() {
+    drawAllPolygons();
+    var parentPoints = getParentPoints();
+    writePoints(parentPoints);
 }
 
 function highlightButtonInteraction (buttonId) {
-    document.querySelector(buttonId).classList.add('active')
-    setTimeout(() => document.querySelector(buttonId).classList.remove('active'), 100)
+    document.querySelector(buttonId).classList.add('active');
+    setTimeout(() => document.querySelector(buttonId).classList.remove('active'), 100);
 }
 
 function undo () {
-    highlightButtonInteraction('#undo')
+    highlightButtonInteraction('#undo');
 
     if (points.length > 0) {
-
-        points.pop()
-        
-        clearDrawings()
-        draw()
+        points.pop();
+        clearDrawings();
+        update();
 
         if(points.length === 0){
             return;
         }
+
         ctx.strokeStyle = rgb_color;
         var i = 0;
         for (; i < points.length - 1; i++) {
-            drawLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            makeLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             ctx.stroke();
-            // draw arc around each point
-            ctx.beginPath();
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
+            drawNode(points[i][0], points[i][1]);
         }
-
-            // draw arc around point n
-            ctx.beginPath();
-            ctx.arc(points[i][0], points[i][1], 5, 0, 2 * Math.PI);
-            // fill with white
-            ctx.fillStyle = 'white';
-            ctx.fill();
-            ctx.stroke();
+        drawNode(points[i][0], points[i][1]);
     }
 }
 
 document.querySelector('#undo').addEventListener('click', function(e) {
-    undo()
+    undo();
 })
 
 function discardCurrentPolygon () {
-    highlightButtonInteraction('#discard-current')
-
-    points = []
-    clearDrawings()
-    draw()
+    highlightButtonInteraction('#discard-current');
+    points = [];
+    clearDrawings();
+    update();
 }
 
 document.querySelector('#discard-current').addEventListener('click', function(e) {
-    discardCurrentPolygon()
+    discardCurrentPolygon();
 })
 
 function clearAll() {
     highlightButtonInteraction('#clear')
-    clearDrawings()
-    points = []
-    masterPoints = []
-    masterColors = []
-    document.querySelector('#json').innerHTML = ''
-    document.querySelector('#python').innerHTML = ''
+    clearDrawings();
+    points = [];
+    masterPoints = [];
+    masterColors = [];
+    document.querySelector('#json').innerHTML = '';
+    document.querySelector('#python').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
-    clearAll()
+    clearAll();
 })
 
 function saveImage () {
-    highlightButtonInteraction('#save-image')
+    highlightButtonInteraction('#save-image');
 
-    var link = document.createElement('a')
-    link.download = 'image.png'
-    link.href = canvas.toDataURL()
-    link.click()
+    var link = document.createElement('a');
+    link.download = 'image.png';
+    link.href = canvas.toDataURL();
+    link.click();
 }
 
 document.querySelector('#save-image').addEventListener('click', function(e) {
-    saveImage()
+    saveImage();
 })
 
 window.addEventListener('keydown', function(e) {
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        undo()
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        undo();
     }
 
     if (e.key === 'Shift') {
@@ -568,23 +528,23 @@ window.addEventListener('keydown', function(e) {
     }
 
     if (e.key === 'Escape') {
-        discardCurrentPolygon()
+        discardCurrentPolygon();
     }
 
     if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
-        clearAll()
+        clearAll();
     }
 
     if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault()
-        e.stopImmediatePropagation()
+        e.preventDefault();
+        e.stopImmediatePropagation();
 
-        saveImage()
+        saveImage();
     }
 
     if (e.key === 'Enter') {
         if(points.length > 2) {
-            closePath()
+            onPathClose();
         }
     }
 })
