@@ -487,6 +487,7 @@ function clearAll() {
     points = [];
     masterPoints = [];
     masterColors = [];
+    rgb_color = color_choices[0];
     document.querySelector('#json').innerHTML = '';
     document.querySelector('#python').innerHTML = '';
 }
