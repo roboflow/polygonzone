@@ -16,7 +16,11 @@ var color_choices = [
 var radiansPer45Degrees = Math.PI / 4;
 
 var canvas = document.getElementById('canvas');
-var ctx = canvas.getContext('2d');
+var mainCtx = canvas.getContext('2d');
+var offScreenCanvas = document.createElement('canvas');
+var offScreenCtx = offScreenCanvas.getContext('2d');
+offScreenCanvas.width = canvas.width;
+offScreenCanvas.height = canvas.height;
 
 var img = new Image();
 var rgb_color = "#FF00FF"; 
@@ -38,14 +42,19 @@ var showNormalized = false;
 var modeMessage = document.querySelector('#mode');
 // var coords = document.querySelector('#coords');
 
+function blitCachedCanvas() {
+    mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+    mainCtx.drawImage(offScreenCanvas, 0, 0);
+}
+
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
     navigator.clipboard.writeText(copyText);
 }
 
 function clearDrawings() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0);
+    offScreenCtx.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
+    blitCachedCanvas();
 }
 
 function isClockwise(vertices) {
@@ -80,9 +89,8 @@ function onPathClose() {
     masterPoints.push(points);
     points = [];
     masterColors.push(rgb_color);
-    clearDrawings();
-    drawAllPolygons();
-    
+    drawAllPolygons(offScreenCtx);
+    blitCachedCanvas();
     rgb_color = color_choices[(masterColors.length) % (color_choices.length)];
 }
 
@@ -94,15 +102,18 @@ img.onload = function() {
     canvas.style.height = img.height * scaleFactor + 'px';
     canvas.width = img.width;
     canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
+    offScreenCanvas.width = img.width;
+    offScreenCanvas.height = img.height;
+    offScreenCtx.drawImage(img, 0, 0);
+    blitCachedCanvas();
 };
 
-function makeLine(x1, y1, x2, y2) {
+function makeLine(ctx, x1, y1, x2, y2) {
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
 }
 
-function drawNode(x, y, stroke = null) {
+function drawNode(ctx, x, y, stroke = null) {
     if (stroke) {
         ctx.strokeStyle = stroke;
     }
@@ -121,7 +132,9 @@ function getScaledCoords(e) {
     return [x / scaleFactor, y / scaleFactor];
 }
 
-function drawAllPolygons () {
+function drawAllPolygons(ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
     // draw polygons as subpaths and fill all at once
     // we do this to avoid overlapping polygons becoming opaque
     ctx.beginPath();
@@ -129,12 +142,12 @@ function drawAllPolygons () {
     for (var i = 0; i < masterPoints.length; i++) {
         var newpoints = masterPoints[i];
         for (var j = 1; j < newpoints.length; j++) {
-            makeLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+            makeLine(ctx, newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
             ctx.moveTo(newpoints[0][0], newpoints[0][1]);
             for (var j = 1; j < newpoints.length; j++) {
                 ctx.lineTo(newpoints[j][0], newpoints[j][1]);
             }
-            makeLine(newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
+            makeLine(ctx, newpoints[newpoints.length - 1][0], newpoints[newpoints.length - 1][1], newpoints[0][0], newpoints[0][1]);
         }
     }
     ctx.fill();
@@ -147,7 +160,7 @@ function drawAllPolygons () {
 
         ctx.beginPath();
         for (var j = 1; j < newpoints.length; j++) {
-            makeLine(newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
+            makeLine(ctx, newpoints[j - 1][0], newpoints[j - 1][1], newpoints[j][0], newpoints[j][1]);
             ctx.moveTo(newpoints[0][0], newpoints[0][1]);
             for (var j = 1; j < newpoints.length; j++) {
                 ctx.lineTo(newpoints[j][0], newpoints[j][1]);
@@ -158,12 +171,12 @@ function drawAllPolygons () {
 
         // draw arc around each point
         for (var j = 0; j < newpoints.length; j++) {
-            drawNode(newpoints[j][0], newpoints[j][1]);
+            drawNode(ctx, newpoints[j][0], newpoints[j][1]);
         }
     }
 }
 
-function getParentPoints () {
+function getParentPoints() {
     var parentPoints = [];
     for (var i = 0; i < masterPoints.length; i++) {
         parentPoints.push(masterPoints[i]);
@@ -240,19 +253,23 @@ canvas.addEventListener('mousemove', function(e) {
     xcoord.innerHTML = x;
     ycoord.innerHTML = y;
 
+    var ctx = mainCtx;
+    ctx.lineWidth = 5;
+    ctx.lineJoin = 'bevel';
+    ctx.fillStyle = 'white';
+
     if (canvas.style.cursor == 'crosshair') {
-        clearDrawings();
-        drawAllPolygons();
+        blitCachedCanvas();
 
         for (var i = 0; i < points.length - 1; i++) {
             ctx.strokeStyle = rgb_color;
             ctx.beginPath();
             ctx.lineJoin = 'bevel';
-            makeLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+            makeLine(ctx, points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
             ctx.closePath();
             ctx.stroke();
 
-            drawNode(points[i][0], points[i][1]);
+            drawNode(ctx, points[i][0], points[i][1]);
         }
 
 
@@ -260,11 +277,11 @@ canvas.addEventListener('mousemove', function(e) {
             ctx.beginPath();
             ctx.lineJoin = 'bevel';
             ctx.strokeStyle = rgb_color;
-            makeLine(points[points.length - 1][0], points[points.length - 1][1], x, y);
+            makeLine(ctx, points[points.length - 1][0], points[points.length - 1][1], x, y);
             ctx.closePath();
             ctx.stroke();
 
-            drawNode(points[i][0], points[i][1]);
+            drawNode(ctx, points[i][0], points[i][1]);
         }
     }
 });
@@ -297,8 +314,11 @@ canvas.addEventListener('drop', function(e) {
         canvas.style.height = img.height * scaleFactor + 'px';
         canvas.width = img.width;
         canvas.height = img.height;
+        offScreenCanvas.width = img.width;
+        offScreenCanvas.height = img.height;
         canvas.style.borderRadius = '10px';
-        ctx.drawImage(img, 0, 0);
+        offScreenCtx.drawImage(img, 0, 0);
+        blitCachedCanvas();
     };
     // show coords
     // document.getElementById('coords').style.display = 'inline-block';
@@ -382,7 +402,7 @@ canvas.addEventListener('click', function(e) {
 
     points.push([x, y]);
 
-    drawNode(x, y, rgb_color); 
+    drawNode(mainCtx, x, y, rgb_color); 
 
     if(drawMode == "line" && points.length == 2) {
         onPathClose();
@@ -432,8 +452,7 @@ document.addEventListener('keydown', function(e) {
     }
 })
 
-function update() {
-    drawAllPolygons();
+function rewritePoints() {
     var parentPoints = getParentPoints();
     writePoints(parentPoints);
 }
@@ -443,26 +462,32 @@ function highlightButtonInteraction (buttonId) {
     setTimeout(() => document.querySelector(buttonId).classList.remove('active'), 100);
 }
 
-function undo () {
+function undo() {
     highlightButtonInteraction('#undo');
 
     if (points.length > 0) {
         points.pop();
-        clearDrawings();
-        update();
+        blitCachedCanvas();
+        rewritePoints();
 
         if(points.length === 0){
             return;
         }
 
+        var ctx = mainCtx;
         ctx.strokeStyle = rgb_color;
-        var i = 0;
-        for (; i < points.length - 1; i++) {
-            makeLine(points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
-            ctx.stroke();
-            drawNode(points[i][0], points[i][1]);
+        ctx.fillStyle = 'white';
+        if (points.length === 1) {
+            drawNode(ctx, points[0][0], points[0][1]);
         }
-        drawNode(points[i][0], points[i][1]);
+        else {
+            drawNode(ctx, points[0][0], points[0][1]);
+            for (var i = 0; i < points.length - 1; i++) {
+                makeLine(ctx, points[i][0], points[i][1], points[i + 1][0], points[i + 1][1]);
+                ctx.stroke();
+                drawNode(ctx, points[i + 1][0], points[i + 1][1]);
+            }
+        }
     }
 }
 
@@ -473,8 +498,8 @@ document.querySelector('#undo').addEventListener('click', function(e) {
 function discardCurrentPolygon () {
     highlightButtonInteraction('#discard-current');
     points = [];
-    clearDrawings();
-    update();
+    blitCachedCanvas();
+    rewritePoints();
 }
 
 document.querySelector('#discard-current').addEventListener('click', function(e) {
@@ -483,7 +508,10 @@ document.querySelector('#discard-current').addEventListener('click', function(e)
 
 function clearAll() {
     highlightButtonInteraction('#clear')
-    clearDrawings();
+    mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+    offScreenCtx.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
+    mainCtx.drawImage(img, 0, 0);
+    offScreenCtx.drawImage(img, 0, 0);
     points = [];
     masterPoints = [];
     masterColors = [];
