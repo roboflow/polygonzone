@@ -191,14 +191,14 @@ window.addEventListener('keyup', function(e) {
     }
 });
 
-document.querySelector('#clipboard').addEventListener('click', function(e) {
+document.querySelector('#copyPythonButton').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboard");
+    clipboard("#pythonCode");
 });
 
-document.querySelector('#clipboardJSON').addEventListener('click', function(e) {
+document.querySelector('#copyJSONButton').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboardJSON");
+    clipboard("#jsonCode");
 });
 
 canvas.addEventListener('dragover', function(e) {
@@ -348,8 +348,8 @@ function writePoints(parentPoints) {
     parentPoints = parentPoints.filter(points => !!points.length);
 
     if (!parentPoints.length) {
-        document.querySelector('#python').innerHTML = '';
-        document.querySelector('#json').innerHTML;
+        document.querySelector('#pythonCode').innerHTML = '';
+        document.querySelector('#jsonCode').innerHTML;
         return;
     }
 
@@ -359,14 +359,14 @@ function writePoints(parentPoints) {
                                 return `[${point[0]}, ${point[1]}]`;}).join(', ')}])`;
                             }).join(',\n')}\n]`;
 
-    document.querySelector('#python').innerHTML = code_template;
+    document.querySelector('#pythonCode').innerHTML = code_template;
 
     var json_template = `{\n${parentPoints.map(function(points) {
         return `    [${points.map(function(point) {
             return `{"x": ${point[0]}, "y": ${point[1]}}`;}).join(', ')}]`;
         }).join(',\n')}\n}`;
 
-    document.querySelector('#json').innerHTML = json_template;
+    document.querySelector('#jsonCode').innerHTML = json_template;
 }
 
 canvas.addEventListener('click', function(e) {
@@ -516,8 +516,8 @@ function clearAll() {
     masterPoints = [];
     masterColors = [];
     rgb_color = color_choices[0];
-    document.querySelector('#json').innerHTML = '';
-    document.querySelector('#python').innerHTML = '';
+    document.querySelector('#jsonCode').innerHTML = '';
+    document.querySelector('#pythonCode').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
