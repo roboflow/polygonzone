@@ -30,7 +30,6 @@ var scaleFactor = 1;
 var scaleSpeed = 0.01;
 
 var points = [];
-var regions = [];
 var masterPoints = [];
 var masterColors = [];
 
@@ -38,9 +37,6 @@ var drawMode;
 setDrawMode('polygon');
 var constrainAngles = false;
 var showNormalized = false;
-
-var modeMessage = document.querySelector('#mode');
-// var coords = document.querySelector('#coords');
 
 function blitCachedCanvas() {
     mainCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -320,8 +316,6 @@ canvas.addEventListener('drop', function(e) {
         offScreenCtx.drawImage(img, 0, 0);
         blitCachedCanvas();
     };
-    // show coords
-    // document.getElementById('coords').style.display = 'inline-block';
 });
 
 function writePoints(parentPoints) {
