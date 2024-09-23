@@ -18,7 +18,16 @@ pre {
 }
 body {
     background: white;
-    min-height: 50vh;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 h1 {
     font-size: 28px;
@@ -30,9 +39,6 @@ details {
     width: 100%;
     margin: 0;
     text-align: left;
-}
-.right {
-    min-height: calc(100vh - 10em);
 }
 nav {
     border-bottom: 1px solid lightgrey;
@@ -59,8 +65,9 @@ a {
     color: #5400ec;
     text-decoration: none;
 }
-.flex {
+.content {
     display: flex;
+    flex-grow: 1;
 }
 .left {
     flex: 50%;
@@ -72,9 +79,14 @@ a {
     flex: 50%;
     padding: 0 2em;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+.image-container {
+    flex-grow: 1;
 }
 @media screen and (max-width: 900px) {
-    .flex {
+    .content {
         display: block;
     }
     .left, .right {

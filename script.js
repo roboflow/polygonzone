@@ -15,6 +15,7 @@ var color_choices = [
 
 var radiansPer45Degrees = Math.PI / 4;
 
+var imageContainer = document.querySelector('.image-container');
 var canvas = document.getElementById('canvas');
 var mainCtx = canvas.getContext('2d');
 var offScreenCanvas = document.createElement('canvas');
@@ -68,16 +69,30 @@ function isClockwise(vertices) {
 }
 
 function zoom(clicks) {
-    // if w > 60em, stop
-    if ((scaleFactor + clicks * scaleSpeed) * img.width > 40 * 16) {
-        return;
+    var newScaleFactor = scaleFactor + clicks * scaleSpeed;
+    newScaleFactor = Math.max(0.1, Math.min(newScaleFactor, 1));
+
+    const maxWidth = imageContainer.offsetWidth * 0.95;
+    const maxHeight = imageContainer.offsetHeight * 0.95;
+
+    let newWidth = img.width * newScaleFactor;
+    let newHeight = img.height * newScaleFactor;
+
+    if (newWidth > maxWidth) {
+        newHeight = (maxWidth / newWidth) * newHeight;
+        newWidth = maxWidth;
+        newScaleFactor = newWidth / img.width;
     }
-    scaleFactor += clicks * scaleSpeed;
-    scaleFactor = Math.max(0.1, Math.min(scaleFactor, 0.8));
-    var w = img.width * scaleFactor;
-    var h = img.height * scaleFactor;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
+
+    if (newHeight > maxHeight) {
+        newWidth = (maxHeight / newHeight) * newWidth;
+        newHeight = maxHeight;
+        newScaleFactor = newHeight / img.height;
+    }
+
+    scaleFactor = newScaleFactor;
+    canvas.style.width = newWidth + 'px';
+    canvas.style.height = newHeight + 'px';
 }
 
 function onPathClose() {
@@ -309,13 +324,31 @@ canvas.addEventListener('drop', function(e) {
     }
 
     img.onload = function() {
-        scaleFactor = 0.25;
-        canvas.style.width = img.width * scaleFactor + 'px';
-        canvas.style.height = img.height * scaleFactor + 'px';
         canvas.width = img.width;
         canvas.height = img.height;
         offScreenCanvas.width = img.width;
         offScreenCanvas.height = img.height;
+
+        const maxWidth = imageContainer.offsetWidth * 0.95;
+        const maxHeight = imageContainer.offsetHeight * 0.95;
+
+        let newWidth = img.width;
+        let newHeight = img.height;
+
+        if (newWidth > maxWidth) {
+            newHeight = (maxWidth / newWidth) * newHeight;
+            newWidth = maxWidth;
+        }
+
+        if (newHeight > maxHeight) {
+            newWidth = (maxHeight / newHeight) * newWidth;
+            newHeight = maxHeight;
+        }
+
+        scaleFactor = newWidth / img.width;
+
+        canvas.style.width = newWidth + 'px';
+        canvas.style.height = newHeight + 'px';
         canvas.style.borderRadius = '10px';
         offScreenCtx.drawImage(img, 0, 0);
         blitCachedCanvas();
