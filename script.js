@@ -23,7 +23,7 @@ offScreenCanvas.width = canvas.width;
 offScreenCanvas.height = canvas.height;
 
 var img = new Image();
-var rgb_color = "#FF00FF"; 
+var rgb_color = color_choices[0];
 var fill_color =  'rgba(0,0,0,0.35)';
 
 var scaleFactor = 1;
@@ -37,6 +37,15 @@ var drawMode;
 setDrawMode('polygon');
 var constrainAngles = false;
 var showNormalized = false;
+
+function resetState() {
+    points = [];
+    masterPoints = [];
+    masterColors = [];
+    rgb_color = color_choices[0];
+    document.querySelector('#json').innerHTML = '';
+    document.querySelector('#python').innerHTML = '';
+}
 
 function blitCachedCanvas() {
     mainCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -305,6 +314,10 @@ canvas.addEventListener('drop', function(e) {
     }
 
     img.onload = function() {
+        // reset state to initial values
+        resetState();
+
+        // draw loaded image on canvas
         scaleFactor = 0.25;
         canvas.style.width = img.width * scaleFactor + 'px';
         canvas.style.height = img.height * scaleFactor + 'px';
@@ -502,16 +515,12 @@ document.querySelector('#discard-current').addEventListener('click', function(e)
 
 function clearAll() {
     highlightButtonInteraction('#clear')
+    resetState();
+    // reset main and offscreen canvases
     mainCtx.clearRect(0, 0, canvas.width, canvas.height);
     offScreenCtx.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
     mainCtx.drawImage(img, 0, 0);
     offScreenCtx.drawImage(img, 0, 0);
-    points = [];
-    masterPoints = [];
-    masterColors = [];
-    rgb_color = color_choices[0];
-    document.querySelector('#json').innerHTML = '';
-    document.querySelector('#python').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
