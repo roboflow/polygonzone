@@ -193,10 +193,6 @@ li {
     margin-top: 1em;
 }
 
-.taskbar-container .tc-container {
-    max-width: 700px;
-}
-
 .taskbar {
     display: flex;
     background-color: #7733f4;
