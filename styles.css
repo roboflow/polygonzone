@@ -63,13 +63,13 @@ a {
     display: flex;
 }
 .left {
-    flex: 50%;
+    flex: 40%;
     padding: 0 1em;
     border-right: 1px solid #e5e7eb;
     box-sizing: border-box;
 }
 .right {
-    flex: 50%;
+    flex: 60%;
     padding: 0 2em;
     box-sizing: border-box;
 }
@@ -191,10 +191,6 @@ li {
     flex-direction: column;
     margin-bottom: 1em;
     margin-top: 1em;
-}
-
-.taskbar-container .tc-container {
-    max-width: 700px;
 }
 
 .taskbar {
