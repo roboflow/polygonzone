@@ -193,12 +193,12 @@ window.addEventListener('keyup', function(e) {
 
 document.querySelector('#clipboard').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboard");
+    clipboard("#python");
 });
 
 document.querySelector('#clipboardJSON').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboardJSON");
+    clipboard("#json");
 });
 
 canvas.addEventListener('dragover', function(e) {
