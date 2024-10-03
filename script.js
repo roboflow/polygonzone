@@ -289,24 +289,19 @@ canvas.addEventListener('mousemove', function(e) {
 canvas.addEventListener('drop', function(e) {
     e.preventDefault();
     var file = e.dataTransfer.files[0];
+
+    // only allow image files
+    var supportedImageTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    if (!supportedImageTypes.includes(file.type)) {
+        alert('Only PNG, JPEG, JPG, and WebP files are allowed.');
+        return;
+    }
+
     var reader = new FileReader();
-    
     reader.onload = function(event) {
-        // only allow image files
         img.src = event.target.result;
     };
     reader.readAsDataURL(file);
-
-    var mime_type = file.type;
-
-    if (
-        mime_type != 'image/png' &&
-        mime_type != 'image/jpeg' &&
-        mime_type != 'image/jpg'
-    ) {
-        alert('Only PNG, JPEG, and JPG files are allowed.');
-        return;
-    }
 
     img.onload = function() {
         scaleFactor = 0.25;
