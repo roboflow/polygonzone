@@ -23,14 +23,13 @@ offScreenCanvas.width = canvas.width;
 offScreenCanvas.height = canvas.height;
 
 var img = new Image();
-var rgb_color = "#FF00FF"; 
+var rgb_color = color_choices[0];
 var fill_color =  'rgba(0,0,0,0.35)';
 
 var scaleFactor = 1;
 var scaleSpeed = 0.01;
 
 var points = [];
-var regions = [];
 var masterPoints = [];
 var masterColors = [];
 
@@ -39,8 +38,14 @@ setDrawMode('polygon');
 var constrainAngles = false;
 var showNormalized = false;
 
-var modeMessage = document.querySelector('#mode');
-// var coords = document.querySelector('#coords');
+function resetState() {
+    points = [];
+    masterPoints = [];
+    masterColors = [];
+    rgb_color = color_choices[0];
+    document.querySelector('#json').innerHTML = '';
+    document.querySelector('#python').innerHTML = '';
+}
 
 
 var isFullscreen = false;
@@ -340,6 +345,10 @@ canvas.addEventListener('drop', function(e) {
     reader.readAsDataURL(file);
 
     img.onload = function() {
+        // reset state to initial values
+        resetState();
+
+        // draw loaded image on canvas
         scaleFactor = 0.25;
         canvas.style.width = img.width * scaleFactor + 'px';
         canvas.style.height = img.height * scaleFactor + 'px';
@@ -351,8 +360,6 @@ canvas.addEventListener('drop', function(e) {
         offScreenCtx.drawImage(img, 0, 0);
         blitCachedCanvas();
     };
-    // show coords
-    // document.getElementById('coords').style.display = 'inline-block';
 });
 
 function writePoints(parentPoints) {
@@ -571,16 +578,12 @@ document.querySelector('#discard-current').addEventListener('click', function(e)
 
 function clearAll() {
     highlightButtonInteraction('#clear')
+    resetState();
+    // reset main and offscreen canvases
     mainCtx.clearRect(0, 0, canvas.width, canvas.height);
     offScreenCtx.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
     mainCtx.drawImage(img, 0, 0);
     offScreenCtx.drawImage(img, 0, 0);
-    points = [];
-    masterPoints = [];
-    masterColors = [];
-    rgb_color = color_choices[0];
-    document.querySelector('#json').innerHTML = '';
-    document.querySelector('#python').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
