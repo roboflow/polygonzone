@@ -42,9 +42,14 @@ var showNormalized = false;
 var modeMessage = document.querySelector('#mode');
 // var coords = document.querySelector('#coords');
 
+
+var isFullscreen = false;
+var taskbarAndCanvas = document.querySelector('.right');
+
 var editMode = false;
 var selectedPointIndex = -1;
 var selectedPolygonIndex = -1;
+
 
 function blitCachedCanvas() {
     mainCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -595,6 +600,36 @@ document.querySelector('#save-image').addEventListener('click', function(e) {
     saveImage();
 })
 
+function toggleFullscreen() {
+    highlightButtonInteraction('#fullscreen');
+    
+    if (!isFullscreen) {
+        if (taskbarAndCanvas.requestFullscreen) {
+            taskbarAndCanvas.requestFullscreen();
+        } else if (taskbarAndCanvas.webkitRequestFullscreen) { // Safari
+            taskbarAndCanvas.webkitRequestFullscreen();
+        } else if (taskbarAndCanvas.msRequestFullscreen) { // IE/Edge
+            taskbarAndCanvas.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) { // Safari
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+    }
+}
+
+document.addEventListener('fullscreenchange', function() {
+    isFullscreen = document.fullscreenElement !== null;
+});
+
+document.querySelector('#fullscreen').addEventListener('click', function(e) {
+    toggleFullscreen();
+});
+
 window.addEventListener('keydown', function(e) {
     if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
@@ -625,5 +660,9 @@ window.addEventListener('keydown', function(e) {
         if(points.length > 2) {
             onPathClose();
         }
+    }
+
+    if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
     }
 })
