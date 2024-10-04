@@ -27,10 +27,46 @@
     </head>
     <body>
         <main>
-            <img class="banner" src="https://media.roboflow.com/polygonzone/polygonzone-banner.png?ik-sdk-version=javascript-1.4.3&updatedAt=1676391478845" />
-            <div class="flex">
+            <nav>
+                <ul>
+                    <li><img src="https://cdn.prod.website-files.com/5f6bc60e665f54545a1e52a5/669974bcd33beb1adf952037_logo-roboflow-purple.svg" /></li>
+                </ul>
+                <ul>
+                    <li><a href="https://github.com/roboflow/polygonzone" target="_blank">View Source Code</a></li>
+                </ul>
+            </nav>
+            <div class="content">
                 <div class="left">
-                    <h1>Draw points to create polygon coordinates</h1>
+                    <div class="how-to section">
+                        <h1>PolygonZone</h1>
+                        <p>PolygonZone lets you calculate polygon points in an image.</p>
+                        <h2>How to use</h2>
+                        <ol class="ta-left">
+                            <li>Drop an image to the indicated area</li>
+                            <li>Select the desired mode: Press <kbd>L</kbd> to draw a line, or <kbd>P</kbd> to draw a polygon</li>
+                            <li>Click to draw polygon points. Press enter to finish the polygon.</li>
+                        </ol>
+                        <h2>Coordinates</h2>
+                        <p>Copy the points below, formatted as NumPy arrays, into your Python code.</p>
+                        <a href="" id="clipboard" class="widgetButton left">Copy Python to Clipboard</a>
+                        <label for="normalize-checkbox">Show Normalized Points from 0-1</label>
+                        <input type="checkbox" id="normalize-checkbox" name="normalize-checkbox" value="normalize-checkbox">
+                        <pre id="python">
+                            <code>
+                            </code>
+                        </pre>
+                        <details>
+                            <summary>View JSON Points</summary>
+                            <h2>JSON Points</h2>
+                            <a href="" id="clipboardJSON" class="widgetButton">Copy JSON to Clipboard</a>
+                            <pre id="json">
+                                <code>
+                                </code>
+                            </pre>
+                        </details>
+                    </div>
+                </div>
+                <div class="right">
                     <div class="taskbar-container">
                         <div class="tc-container">
                             <div class="taskbar">
@@ -42,10 +78,17 @@
                                     </span>
                                 </div>
                                 <div class="t-icon t-mode" id="mode-line">
-                                    <i class="fa-solid fa-arrows-left-right"></i>
+                                    <i class="fa-solid fa-lines-leaning"></i>
                                     <span class="ti-caption">
                                         <span>Line Mode</span>
                                         <span>(L)</span>
+                                    </span>
+                                </div>
+                                <div class="t-icon t-mode" id="mode-edit">
+                                    <i class="fa-solid fa-up-down-left-right"></i>
+                                    <span class="ti-caption">
+                                        <span>Edit Mode</span>
+                                        <span>(E)</span>
                                     </span>
                                 </div>
                                 <div class="t-divider"></div>
@@ -63,19 +106,26 @@
                                         <span>(Esc)</span>
                                     </span>
                                 </div>
-                                <div class="t-divider"></div>
                                 <div class="t-icon" id="clear">
-                                    <i class="fa-solid fa-trash-can"></i>
+                                    <i class="fa-solid fa-trash"></i>
                                     <span class="ti-caption">
                                         <span>Clear all polygons</span>
                                         <span>(Ctrl/⌘-E)</span>
                                     </span>
                                 </div>
+                                <div class="t-divider"></div>
                                 <div class="t-icon" id="save-image">
                                     <i class="fa-solid fa-floppy-disk"></i>
                                     <span class="ti-caption">
                                         <span>Save image</span>
                                         <span>(Ctrl/⌘-S)</span>
+                                    </span>
+                                </div>
+                                <div class="t-icon" id="fullscreen">
+                                    <i class="fa-solid fa-expand"></i>
+                                    <span class="ti-caption">
+                                        <span>Fullscreen</span>
+                                        <span>(F)</span>
                                     </span>
                                 </div>
                             </div>
@@ -88,70 +138,11 @@
                             </div>
                         </div>
                     </div>
-
-                    <canvas id="canvas"></canvas>
-                </div>
-                <div class="right">
-                    <div class="how-to section">
-                        <h2>How to use</h2>
-                        <ol class="ta-left">
-                            <li>Drop an image to the indicated area</li>
-                            <li>Select the desired mode: Press <kbd>L</kbd> to draw a line, or <kbd>P</kbd> to draw a polygon</li>
-                            <li>Start creating your polygon, clicking in the desired points of the image</li>
-                            <li>If in polygon mode, press <kbd>ENTER</kbd> to finish the polygon</li>
-                            <li>Repeat steps 2 - 4 as many times as you want</li>
-                            <li>To finish, copy the numpy points to your clipboard</li>
-                        </ol>
-                    </div>
-                    <div class="points-output section">
-                        <h2>NumPy Points</h2>
-                        <p>Copy the points below into your Python code.</p>
-                        <a href="" id="copyPythonButton" class="widgetButton">Copy Python to Clipboard</a>
-                        <pre id="pythonCode">
-                            <code>
-                            </code>
-                        </pre>
-                        <div class="show-normalized mb-3">
-                            <label for="normalize-checkbox">Show Normalized Points from 0-1</label>
-                            <input type="checkbox" id="normalize-checkbox" name="normalize-checkbox" value="normalize-checkbox">
-                        </div>
-                        <details>
-                            <summary>View JSON Points</summary>
-                            <h2>JSON Points</h2>
-                            <a href="" id="copyJSONButton" class="widgetButton">Copy JSON to Clipboard</a>
-                            <pre id="jsonCode">
-                                <code>
-                                </code>
-                            </pre>
-                        </details>
-                    </div>
-                    <div class="learning-resources section">
-                        <h2>Learning Resources</h2>
-                        <p>Browse our tutorials that walk through using PolygonZone and building projects with zones.</p>
-                        <div class="grid">
-                            <div class="card">
-                                <a href="https://www.youtube.com/watch?v=l_kf9CfZ_8M">
-                                    <img src="https://i.ytimg.com/vi/l_kf9CfZ_8M/maxresdefault.jpg" />
-                                    <h3>Count People in Zone Using YOLOv5, YOLOv8, and Detectron2</h3>
-                                    <p>Learn how to use Roboflow supervision to count people in a zone using YOLOv5, YOLOv8, and Detectron2.</p>
-                                </a>
-                            </div>
-                            <div class="card">
-                                <a href="https://blog.roboflow.com/polygonzone">
-                                    <img src="https://media.roboflow.com/polygonzone/thumbnail.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676366680992" />
-                                    <h3>How to Use PolygonZone</h3>
-                                    <p>Learn how to use PolygonZone to create polygons for your computer vision projects.</p>
-                                </a>
-                            </div>
-                        </div>
-                        <a href="https://blog.roboflow.com" class="widgetButton">Explore More Tutorials</a>
+                    <div class="image-container">
+                        <canvas id="canvas"></canvas>
                     </div>
                 </div>
             </div>
-
-            <footer>
-                <p>Made with ❤️ by <a href="https://roboflow.com">Roboflow.</a> <a href="https://github.com/roboflow/polygonzone">View source code.</a></p>
-            </footer>
         </main>
         <script src="script.js"></script>
     </body>
