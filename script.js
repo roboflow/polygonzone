@@ -375,7 +375,7 @@ function writePoints(parentPoints) {
 
     if (!parentPoints.length) {
         document.querySelector('#python').innerHTML = '';
-        document.querySelector('#json').innerHTML;
+        document.querySelector('#json').innerHTML = '';
         return;
     }
 
