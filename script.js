@@ -64,6 +64,8 @@ function blitCachedCanvas() {
 
 function clipboard(selector) {
     var copyText = document.querySelector(selector).innerText;
+    // strip whitespace on left and right
+    copyText = copyText.replace(/^\s+|\s+$/g, '');
     navigator.clipboard.writeText(copyText);
 }
 
@@ -242,14 +244,14 @@ window.addEventListener('keyup', function(e) {
     }
 });
 
-document.querySelector('#clipboard').addEventListener('click', function(e) {
+document.querySelector('#copyPythonButton').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboard");
+    clipboard("#python");
 });
 
-document.querySelector('#clipboardJSON').addEventListener('click', function(e) {
+document.querySelector('#copyJSONButton').addEventListener('click', function(e) {
     e.preventDefault();
-    clipboard("#clipboardJSON");
+    clipboard("#json");
 });
 
 canvas.addEventListener('dragover', function(e) {
@@ -423,7 +425,7 @@ function writePoints(parentPoints) {
 
     if (!parentPoints.length) {
         document.querySelector('#python').innerHTML = '';
-        document.querySelector('#json').innerHTML = '';
+        document.querySelector('#json').innerHTML;
         return;
     }
 
@@ -620,6 +622,12 @@ function clearAll() {
     offScreenCtx.clearRect(0, 0, offScreenCanvas.width, offScreenCanvas.height);
     mainCtx.drawImage(img, 0, 0);
     offScreenCtx.drawImage(img, 0, 0);
+    points = [];
+    masterPoints = [];
+    masterColors = [];
+    rgb_color = color_choices[0];
+    document.querySelector('#jsonCode').innerHTML = '';
+    document.querySelector('#pythonCode').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
