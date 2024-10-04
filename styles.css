@@ -3,7 +3,7 @@ canvas {
     margin: 0 auto;
 }
 * {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
 pre {
     max-height: 200px;
@@ -12,22 +12,47 @@ pre {
     background-color:rgba(17,24,39,0.1);
     padding: 10px;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-y: scroll;
+    text-wrap: wrap;
+    text-align: left;
 }
 body {
-    background: rgba(17,24,39,0.4);
-    min-height: 50vh;
+    background: white;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 h1 {
     font-size: 28px;
 }
 h1, h2 {
-    color: #5400ec;
+    color: rgb(103, 6, 206);
 }
 details {
     width: 100%;
     margin: 0;
     text-align: left;
+}
+nav {
+    border-bottom: 1px solid lightgrey;
+    display: flex;
+    justify-content: space-between;
+}
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    padding-left: 1em;
+}
+nav ul li {
+    display: inline;
+    margin-right: 10px;
 }
 summary {
     border: 2px solid #00ffce;
@@ -40,44 +65,28 @@ a {
     color: #5400ec;
     text-decoration: none;
 }
-main {
-    text-align: center;
-    background: white;
-    padding: 2em;
-    border-radius: 1em;
-}
-.flex {
+.content {
     display: flex;
+    flex-grow: 1;
 }
 .left {
-    flex: 0 50%;
-    padding: 0 2em;
+    flex: 40%;
+    padding: 0 1em;
     border-right: 1px solid #e5e7eb;
+    box-sizing: border-box;
 }
 .right {
-    flex: 0 50%;
+    flex: 60%;
     padding: 0 2em;
-}
-pre {
-    text-align: left;
-}
-.side_by_side {
+    box-sizing: border-box;
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: column;
 }
-.side_by_side:first-child {
-    flex: 0 50%;
+.image-container {
+    flex-grow: 1;
 }
-.side_by_side:last-child {
-    flex: 0 40%;
-    width: 100% !important;
-}
-@media screen and (max-width: 1200px) {
-    main {
-        padding: 3em;
-    }
-    .side_by_side, .flex {
+@media screen and (max-width: 900px) {
+    .content {
         display: block;
     }
     .left, .right {
@@ -85,6 +94,14 @@ pre {
     }
     .left {
         border-right: 0;
+    }
+
+    canvas {
+        margin-bottom: 50px;
+    }
+    .right {
+        width: 45em;
+        margin: auto;
     }
 }
 .controls {
@@ -155,7 +172,20 @@ pre {
     line-height: 1.4;
     font-weight: 400;
 }
-.show_normalized {
+
+footer {
+    margin-top: 50px;
+}
+
+.section {
+    margin-bottom: 50px;
+}
+
+li {
+    margin-bottom: 4px;
+}
+
+.show-normalized {
     background-color: #5400ec;
     opacity: 0.8;
     color: white;
@@ -164,10 +194,118 @@ pre {
     padding: 15px;
     border-radius: 10px;
 }
-footer {
-    margin-top: 20px;
+
+/* Taskbar */
+.taskbar-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 1em;
+    margin-top: 1em;
 }
 
+.taskbar {
+    display: flex;
+    background-color: #7733f4;
+    color: #f1edf8;
+
+    border-radius: 5px;
+    padding: 6px;
+
+    justify-content:space-around;
+    box-shadow: 0 2px 3px 1px rgb(0 0 0 / 20%);
+}
+
+.taskbar .t-icon {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 24px;
+    border-radius: 5px;
+    transition: all .15s ease-in-out;
+}
+
+.taskbar .t-icon:hover {
+    cursor: pointer;
+    background-color: #8f54fd;
+}
+
+.taskbar .t-icon.active {
+    background-color: #f4efff;
+    color: #7733f4;
+}
+
+.taskbar .t-icon .ti-caption {
+    font-size: 11px;
+    margin-top: 8px;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.taskbar .t-divider {
+    background-color: #8145f1;
+    width: 1px;
+}
+
+/* Coordinates */
+.coordinates {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 5px;
+    margin-top: 8px;
+    
+    font-size: 1em;
+    box-shadow: 0 2px 3px 1px rgb(0 0 0 / 20%);
+    background-color: #fbf9ff;
+}
+
+.coordinates .cc-title {
+    margin-bottom: 4px;
+    color: #5400ec;
+}
+
+.coordinates .cc-coord {
+    margin-bottom: 2px;
+    color: #989898;
+}
+
+.coordinates .cc-value {
+    color: #000;
+}
+
+
+/* Helpers */
+.ta-left {
+    text-align: left;
+}
+
+.mb-1 {
+    margin-bottom: 8px;
+}
+
+.mb-2 {
+    margin-bottom: 16px;
+}
+
+.mb-3 {
+    margin-bottom: 24px;
+}
+
+.mt-1 {
+    margin-top: 8px;
+}
+
+.mt-2 {
+    margin-top: 16px;
+}
 
 input::file-selector-button {
     border-radius: 4px;
@@ -178,4 +316,7 @@ input::file-selector-button {
     font-weight: 700;
     text-align: center;
     letter-spacing: .5px;
-}
+
+.mt-3 {
+    margin-top: 24px;
+  }
