@@ -46,6 +46,12 @@
                             <li>Select the desired mode: Press <kbd>L</kbd> to draw a line, or <kbd>P</kbd> to draw a polygon</li>
                             <li>Click to draw polygon points. Press enter to finish the polygon.</li>
                         </ol>
+                        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                            <h2>Import / Edit</h2>
+                            <p>Copy your NumPy array below to load and edit polygons.</p>
+                            <textarea id="python-input" style="width: 100%; height: 150px; background: rgba(17,24,39,0.05); border: 1px solid #ddd; padding: 10px; font-family: monospace;" placeholder="Paste your NumPy array here, e.g., [np.array([[100, 200], ...])]"></textarea>
+                            <button id="loadPythonButton" class="widgetButton left" style="margin-top: 10px;">Load Points from Python</button>
+                            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
                         <h2>Coordinates</h2>
                         <p>Copy the points below, formatted as NumPy arrays, into your Python code.</p>
                         <a href="" id="copyPythonButton" class="widgetButton left">Copy Python to Clipboard</a>
