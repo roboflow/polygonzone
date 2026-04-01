@@ -216,6 +216,79 @@ function getParentPoints() {
     return parentPoints;
 }
 
+// ---------------------------------------------------------------------------
+// Measurement helpers
+// ---------------------------------------------------------------------------
+
+function distToSegment(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const lenSq = dx * dx + dy * dy;
+    if (lenSq === 0) return Math.sqrt((px - x1) ** 2 + (py - y1) ** 2);
+    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lenSq));
+    return Math.sqrt((px - (x1 + t * dx)) ** 2 + (py - (y1 + t * dy)) ** 2);
+}
+
+function polygonArea(pts) {
+    let area = 0;
+    for (let i = 0; i < pts.length; i++) {
+        const [x1, y1] = pts[i];
+        const [x2, y2] = pts[(i + 1) % pts.length];
+        area += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(area) / 2;
+}
+
+function pointInPolygon(x, y, pts) {
+    let inside = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+        const [xi, yi] = pts[i];
+        const [xj, yj] = pts[j];
+        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) {
+            inside = !inside;
+        }
+    }
+    return inside;
+}
+
+var _measureTooltipTimer = null;
+
+function showMeasureTooltip(text, screenX, screenY) {
+    const tooltip = document.getElementById('measure-tooltip');
+    tooltip.textContent = text;
+    tooltip.style.left = (screenX + 14) + 'px';
+    tooltip.style.top = (screenY - 36) + 'px';
+    tooltip.style.display = 'block';
+    clearTimeout(_measureTooltipTimer);
+    _measureTooltipTimer = setTimeout(() => { tooltip.style.display = 'none'; }, 3000);
+}
+
+function checkAndShowMeasurement(canvasX, canvasY, screenX, screenY) {
+    const hitThreshold = 8 / scaleFactor;
+
+    for (let i = 0; i < masterPoints.length; i++) {
+        const poly = masterPoints[i];
+        for (let j = 0; j < poly.length; j++) {
+            const [x1, y1] = poly[j];
+            const [x2, y2] = poly[(j + 1) % poly.length];
+            if (distToSegment(canvasX, canvasY, x1, y1, x2, y2) < hitThreshold) {
+                const len = Math.round(Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2));
+                showMeasureTooltip(`Length: ${len}px`, screenX, screenY);
+                return true;
+            }
+        }
+    }
+
+    for (let i = 0; i < masterPoints.length; i++) {
+        if (masterPoints[i].length >= 3 && pointInPolygon(canvasX, canvasY, masterPoints[i])) {
+            const area = Math.round(polygonArea(masterPoints[i]));
+            showMeasureTooltip(`Area: ${area.toLocaleString()}px²`, screenX, screenY);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function findClosestPoint(x, y) {
     let minDist = Infinity;
     let closestPoint = null;
@@ -456,9 +529,13 @@ canvas.addEventListener('mousedown', function(e) {
             selectedPointIndex = pointIndex;
             selectedPolygonIndex = polygonIndex;
             canvas.style.cursor = 'grabbing';
+        } else {
+            checkAndShowMeasurement(x, y, e.clientX, e.clientY);
         }
     } else {
         // click handling for drawing mode
+        if (points.length === 0 && checkAndShowMeasurement(x, y, e.clientX, e.clientY)) return;
+
         canvas.style.cursor = 'crosshair';
 
         if(constrainAngles && points.length > 0) {
