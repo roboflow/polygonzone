@@ -2,6 +2,18 @@ canvas {
     display: block;
     margin: 0 auto;
 }
+.measure-tooltip {
+    display: none;
+    position: fixed;
+    background: rgba(0, 0, 0, 0.82);
+    color: #fff;
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 1000;
+    white-space: nowrap;
+}
 * {
     font-family: Tahoma, Arial, Helvetica, sans-serif;
 }
