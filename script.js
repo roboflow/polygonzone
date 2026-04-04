@@ -713,3 +713,88 @@ window.addEventListener('keydown', function(e) {
         toggleFullscreen();
     }
 })
+
+document.querySelector('#loadCoordinates').addEventListener('click',function(e) {
+    e.preventDefault();
+    
+    if(!img || !img.complete || img.naturalWidth === 0){
+        alert("Please upload an image before loading points");
+    }
+    
+    var inputVal = document.querySelector('#load-coordinates').value.trim();
+    if(!inputVal) return;
+    
+    try{
+        // Sanitize input 
+        var sanitized = inputVal;
+        sanitized = sanitized.replace(/np\.array\(/g,'').replace(/\)/g,'');
+
+        if(sanitized.startsWith('{') && sanitized.endsWith('}')){
+            sanitized = '[' + sanitized.substring(1,sanitized.length-1)+']';
+        }
+        sanitized = sanitized.replace(/,\s*([\]}])/g,'$1');
+        var parsed = JSON.parse(sanitized);
+
+        // convert object based points into array pairs
+        const objectToArray=(arr) => {
+            if(Array.isArray(arr)){
+                if(arr.length >0 && typeof arr[0] === 'object' && arr[0] !== null && 'x' in arr[0]) {
+                    return arr.map(point => [point.x,point.y]);
+                }
+                return arr.map(objectToArray);
+            }
+            return arr;
+        };
+        parsed = objectToArray(parsed);
+        
+        if(parsed.length > 0 && Array.isArray(parsed[0]) && !Array.isArray(parsed[0][0])){
+            parsed = [parsed];
+        }
+
+        if(!Array.isArray(parsed) || !Array.isArray(parsed[0]) ||!Array.isArray(parsed[0][0])){
+            throw new Error("Invalid coordinate structure. Needs to be a list of polygons or single polygon.");
+        }
+        
+        //  Detect and convert normalized points (0-1) to absolute pixels
+        var isNormalized = true;
+        for (var i=0;i<parsed.length;i++){
+            for (var j=0;j<parsed[i].length;j++){
+                if(parsed[i][j][0] > 1 || parsed[i][j][1]>1){
+                    isNormalized = false;
+                    break;
+                }
+            }
+            if(!isNormalized) break;
+        }
+
+        if(isNormalized){
+            for(var i=0; i<parsed.length;i++){
+                for (var j=0;j<parsed[i].length;j++){
+                    parsed[i][j][0] = parsed[i][j][0] * img.naturalWidth;
+                    parsed[i][j][1] = parsed[i][j][1] * img.naturalHeight;
+                }
+            }
+        }
+
+        // Push points and color
+        for(var i = 0; i< parsed.length;i++){
+            masterPoints.push(parsed[i]);
+
+            masterColors.push(rgb_color);
+            rgb_color = color_choices[(masterColors.length) % color_choices.length];
+        } 
+        
+        drawAllPolygons(offScreenCtx); // Redraw
+        
+        blitCachedCanvas();
+
+        // Update output Python/JSON output boxes
+        writePoints(masterPoints);
+
+        document.querySelector('#load-coordinates').value='';
+    }
+    catch(err){
+        console.error(err);
+        alert("Failed to parse coordinates",err.message);
+    }
+});
