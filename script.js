@@ -425,7 +425,7 @@ function writePoints(parentPoints) {
 
     if (!parentPoints.length) {
         document.querySelector('#python').innerHTML = '';
-        document.querySelector('#json').innerHTML;
+        document.querySelector('#json').innerHTML = '';
         return;
     }
 
@@ -573,6 +573,16 @@ function highlightButtonInteraction (buttonId) {
 function undo() {
     highlightButtonInteraction('#undo');
 
+    if (points.length === 0 && masterPoints.length > 0) {
+        masterPoints.pop();
+        masterColors.pop();
+        rgb_color = color_choices[(masterColors.length) % (color_choices.length)];
+        drawAllPolygons(offScreenCtx);
+        blitCachedCanvas();
+        rewritePoints();
+        return;
+    }
+
     if (points.length > 0) {
         points.pop();
         blitCachedCanvas();
@@ -626,8 +636,8 @@ function clearAll() {
     masterPoints = [];
     masterColors = [];
     rgb_color = color_choices[0];
-    document.querySelector('#jsonCode').innerHTML = '';
-    document.querySelector('#pythonCode').innerHTML = '';
+    document.querySelector('#json').innerHTML = '';
+    document.querySelector('#python').innerHTML = '';
 }
 
 document.querySelector('#clear').addEventListener('click', function(e) {
