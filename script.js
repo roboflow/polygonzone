@@ -53,6 +53,7 @@ var isFullscreen = false;
 var taskbarAndCanvas = document.querySelector('.right');
 
 var editMode = false;
+var addPoint = false;
 var selectedPointIndex = -1;
 var selectedPolygonIndex = -1;
 
@@ -216,6 +217,42 @@ function getParentPoints() {
     return parentPoints;
 }
 
+function findClosestLine(x, y) {
+    for (let i = 0; i < masterPoints.length; i++) {
+        const lineOrPoly = masterPoints[i];
+
+        for (let j = 0; j < lineOrPoly.length; j++) {
+            const [p1x, p1y] = lineOrPoly[j];
+            let [p2x, p2y] = lineOrPoly[0]; // wrap around in case we're at the end
+            if(lineOrPoly[j+1] != undefined) {
+                [p2x, p2y] = lineOrPoly[j+1];
+            }
+
+            const m = (p2y - p1y) / (p2x - p1x);
+
+            if(m == 0) { // cumbersome edge case of two-point slope
+                const horzStart = Math.min(p2x,p1x);
+                const horzEnd = Math.max(p2x,p1x);
+                if(x >= horzStart && x <= horzEnd && p2y - 5 <= y && y <= p2y + 5 ) {
+                    return i;
+                }
+            }
+            let b = 0
+            if(p1x < p2x) b = p1y
+            if(p1x > p2x) b = p2y
+
+            // ( y - b ) / m because Y is upside down and that's too hard
+            const predictX = Math.round(Math.abs(p1x + ((y-p1y)/m)))
+
+            if(predictX - 5 <= x && x <= predictX + 5) {
+                return i;
+            }
+        }
+    }
+
+    return -1
+}
+
 function findClosestPoint(x, y) {
     let minDist = Infinity;
     let closestPoint = null;
@@ -341,6 +378,8 @@ canvas.addEventListener('mousemove', function(e) {
         drawAllPolygons(offScreenCtx);
         blitCachedCanvas();
         writePoints(getParentPoints());
+    } else if (editMode && selectedPointIndex == -1 && addPoint) {
+
     }
 });
 
@@ -456,6 +495,9 @@ canvas.addEventListener('mousedown', function(e) {
             selectedPointIndex = pointIndex;
             selectedPolygonIndex = polygonIndex;
             canvas.style.cursor = 'grabbing';
+        } else { // don't try add a point if you're already over one
+          const polygonIndex = findClosestLine(x,y);
+console.log('=-=-=- Clicked on a line? ', polygonIndex > -1);
         }
     } else {
         // click handling for drawing mode
@@ -512,6 +554,7 @@ canvas.addEventListener('mouseup', function(e) {
         selectedPointIndex = -1;
         selectedPolygonIndex = -1;
         canvas.style.cursor = 'move';
+        addPoint = true
     }
 });
 
