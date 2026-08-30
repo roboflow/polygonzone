@@ -53,7 +53,6 @@ var isFullscreen = false;
 var taskbarAndCanvas = document.querySelector('.right');
 
 var editMode = false;
-var addPoint = false;
 var selectedPointIndex = -1;
 var selectedPolygonIndex = -1;
 
@@ -230,13 +229,14 @@ function findClosestLine(x, y) {
 
             const m = (p2y - p1y) / (p2x - p1x);
 
-            if(m == 0) { // cumbersome edge case of two-point slope
+            if(m == 0) { // cumbersome edge case of two-point slope. @TODO: needs buffer
                 const horzStart = Math.min(p2x,p1x);
                 const horzEnd = Math.max(p2x,p1x);
                 if(x >= horzStart && x <= horzEnd && p2y - 5 <= y && y <= p2y + 5 ) {
-                    return i;
+                    return { polygonIndex: i, insertionIndex: j };
                 }
             }
+
             let b = 0
             if(p1x < p2x) b = p1y
             if(p1x > p2x) b = p2y
@@ -245,12 +245,12 @@ function findClosestLine(x, y) {
             const predictX = Math.round(Math.abs(p1x + ((y-p1y)/m)))
 
             if(predictX - 5 <= x && x <= predictX + 5) {
-                return i;
+                return { polygonIndex: i, insertionIndex: j };
             }
         }
     }
 
-    return -1
+    return { polygonIndex: -1, insertionIndex: -1 };
 }
 
 function findClosestPoint(x, y) {
@@ -378,8 +378,6 @@ canvas.addEventListener('mousemove', function(e) {
         drawAllPolygons(offScreenCtx);
         blitCachedCanvas();
         writePoints(getParentPoints());
-    } else if (editMode && selectedPointIndex == -1 && addPoint) {
-
     }
 });
 
@@ -496,8 +494,15 @@ canvas.addEventListener('mousedown', function(e) {
             selectedPolygonIndex = polygonIndex;
             canvas.style.cursor = 'grabbing';
         } else { // don't try add a point if you're already over one
-          const polygonIndex = findClosestLine(x,y);
-console.log('=-=-=- Clicked on a line? ', polygonIndex > -1);
+          const { polygonIndex, insertionIndex } = findClosestLine(x,y);
+
+          if(polygonIndex > -1) {
+            canvas.style.cursor = 'crosshair';
+            masterPoints[polygonIndex].splice(insertionIndex+1, 0, [x, y]);
+            drawAllPolygons(offScreenCtx);
+            blitCachedCanvas();
+            writePoints(getParentPoints());
+          }
         }
     } else {
         // click handling for drawing mode
@@ -554,7 +559,6 @@ canvas.addEventListener('mouseup', function(e) {
         selectedPointIndex = -1;
         selectedPolygonIndex = -1;
         canvas.style.cursor = 'move';
-        addPoint = true
     }
 });
 
